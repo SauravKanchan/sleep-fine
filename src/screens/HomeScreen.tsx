@@ -3,7 +3,7 @@ import { View, Text, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
 import { initHealthKit, getSleepData } from '../services/healthkit';
 import { SleepSample } from '../types/sleep';
 import { Linking, Alert, Button } from 'react-native';
-// import SleepChart from '../components/SleepChart';
+import SleepChart from '../components/SleepChart';
 
 
 const HomeScreen: React.FC = () => {
@@ -823,8 +823,7 @@ const HomeScreen: React.FC = () => {
     "endDate": "2025-05-03T21:00:06.190+0100",
     "sourceName": "Soham’s Apple Watch",
     "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
-  }
-]);
+  }]);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -836,7 +835,7 @@ const HomeScreen: React.FC = () => {
         const start = new Date();
         start.setDate(start.getDate() - 7);
         const data = await getSleepData(start);
-        setSleepData(data);
+        // setSleepData(data); // For testing
       } catch (err) {
         setError((err as Error).message);
       }
@@ -852,7 +851,7 @@ const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Text style={styles.title}>Sleep Data (Last 7 Days)</Text>
-        {/* {sleepData.length > 0 && <SleepChart data={sleepData} />} */}
+        {sleepData.length > 0 && <SleepChart data={sleepData} />}
 
         {error && (
           <View style={styles.errorContainer}>
@@ -867,14 +866,14 @@ const HomeScreen: React.FC = () => {
           </Text>
         )}
 
-        {sleepData.map((entry, index) => (
+        {/* {sleepData.map((entry, index) => (
           <View key={index} style={styles.card}>
             <Text>Start: {entry.startDate}</Text>
             <Text>End: {entry.endDate}</Text>
             <Text>Value: {entry.value}</Text>
             {entry.sourceName && <Text>Source: {entry.sourceName}</Text>}
           </View>
-        ))}
+        ))} */}
       </ScrollView>
     </SafeAreaView>
   );
