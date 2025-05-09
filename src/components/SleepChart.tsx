@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { CartesianChart, Bar } from 'victory-native';
 import { SleepSample } from '../types/sleep';
 import { useFont, Canvas, Text as T } from '@shopify/react-native-skia';
-import {Platform} from "react-native";
+import { Platform } from 'react-native';
 // @ts-ignore
 import NotoSansJPRegular from '../assets/fonts/NotoSansJPRegular.ttf';
 
@@ -18,53 +18,49 @@ interface ChartDatum {
 
 const SleepChart: React.FC<Props> = ({ data }) => {
   let chartRawData: { [key: string]: any } = {};
-  data.forEach(entry => {
+  data.forEach((entry) => {
     const start = new Date(entry.startDate).getTime();
     const end = new Date(entry.endDate).getTime();
-    const hours = (end - start);
+    const hours = end - start;
     const dateLabel = new Date(entry.startDate).toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     });
-    const d = { x: dateLabel, y: hours};
+    const d = { x: dateLabel, y: hours };
 
     if (!chartRawData[dateLabel]) {
       chartRawData[dateLabel] = {
-        "AWAKE": 0,
-        "CORE": 0,
-        "DEEP": 0,
-        "REM": 0,
+        AWAKE: 0,
+        CORE: 0,
+        DEEP: 0,
+        REM: 0,
       };
     }
-    chartRawData[dateLabel][entry["value"]] += d.y;
+    chartRawData[dateLabel][entry['value']] += d.y;
   });
 
-  const chartData = (Object.entries(chartRawData).map(([key, value]) => ({
+  const chartData = Object.entries(chartRawData).map(([key, value]) => ({
     x: key,
-    AWAKE: value["AWAKE"],
-    CORE: value["CORE"],
-    DEEP: value["DEEP"],
-    REM: value["REM"],
-  })));
+    AWAKE: value['AWAKE'] / (60 * 60 * 1000),
+    CORE: value['CORE'] / (60 * 60 * 1000),
+    DEEP: value['DEEP'] / (60 * 60 * 1000),
+    REM: value['REM'] / (60 * 60 * 1000),
+  }));
+  console.log('chartData', chartData);
   const screenWidth = Dimensions.get('window').width;
-  const font = useFont(undefined, 42, (err) => {
+  const font = useFont(NotoSansJPRegular, 12, (err) => {
     console.error('Font loading error:', err);
   });
   return (
-    <View style={{ height: 300 }}>
+    <View style={{ height: 300, padding: 10 }}>
       <Text style={styles.title}>Sleep Trend (Last 7 Days)</Text>
       <CartesianChart
         data={chartData}
         xKey="x"
         yKeys={['AWAKE', 'CORE', 'DEEP', 'REM']}
-        domainPadding={{ left: 10, right: 10, top: 20, bottom: 40 }}
-        padding={{ left: 20, right: 20, top: 20, bottom: 40 }}
-        axisOptions={{font,
-          formatXLabel: (value) => {
-          return value;
-        },
+        axisOptions={{
+          font,
         }}
-
       >
         {({ points, chartBounds }) => (
           <>
@@ -75,10 +71,6 @@ const SleepChart: React.FC<Props> = ({ data }) => {
           </>
         )}
       </CartesianChart>
-      <Canvas style={{ flex: 1 }}>
-        <T x={0} y={100} text={'Hello'} font={font} color="black" />
-        {/* \uF101 is an example Ionicon codepoint */}
-      </Canvas>
     </View>
   );
 };

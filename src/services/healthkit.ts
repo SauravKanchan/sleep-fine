@@ -1,6 +1,6 @@
-import BrokenHealthKit, { HealthKitPermissions } from "react-native-health";
+import BrokenHealthKit, { HealthKitPermissions } from 'react-native-health';
 
-const NativeModules = require("react-native").NativeModules;
+const NativeModules = require('react-native').NativeModules;
 const AppleHealthKit = NativeModules.AppleHealthKit as typeof BrokenHealthKit;
 AppleHealthKit.Constants = BrokenHealthKit.Constants;
 
@@ -15,11 +15,13 @@ const healthKitOptions: any = {
  * Initializes Apple HealthKit with the required permissions.
  */
 export const initHealthKit = (): Promise<boolean> => {
-  console.log({AppleHealthKit})
+  console.log({ AppleHealthKit });
   return new Promise((resolve, reject) => {
     AppleHealthKit.initHealthKit(healthKitOptions, (error: string) => {
       if (error) {
-        reject(new Error('HealthKit permissions were not granted. Please enable them in Settings.'));
+        reject(
+          new Error('HealthKit permissions were not granted. Please enable them in Settings.'),
+        );
       } else {
         resolve(true);
       }
