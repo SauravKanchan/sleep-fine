@@ -52,25 +52,38 @@ const SleepChart: React.FC<Props> = ({ data }) => {
     console.error('Font loading error:', err);
   });
   return (
-    <View style={{ height: 300, padding: 10 }}>
+    <View style={{ height: 300, padding: 20, backgroundColor: 'white' }}>
       <Text style={styles.title}>Sleep Trend (Last 7 Days)</Text>
-      <CartesianChart
-        data={chartData}
-        xKey="x"
-        yKeys={['AWAKE', 'CORE', 'DEEP', 'REM']}
-        axisOptions={{
-          font,
-        }}
-      >
-        {({ points, chartBounds }) => (
-          <>
-            <Bar points={points.AWAKE} chartBounds={chartBounds} color="#4CAF50" />
-            <Bar points={points.CORE} chartBounds={chartBounds} color="#2196F3" />
-            <Bar points={points.DEEP} chartBounds={chartBounds} color="#9C27B0" />
-            <Bar points={points.REM} chartBounds={chartBounds} color="#FF9800" />
-          </>
-        )}
-      </CartesianChart>
+      {data.length === 0 && (
+        <Text style={{ textAlign: 'center', fontSize: 16, color: '#888' }}>
+          No sleep data available
+        </Text>
+      )}
+      {data.length > 0 && (
+        <CartesianChart
+          data={chartData}
+          xKey="x"
+          yKeys={['AWAKE', 'CORE', 'DEEP', 'REM']}
+          axisOptions={{
+            font,
+          }}
+          domainPadding={{ left: 70, right: 70, top: 30 }}
+        >
+          {({ points, chartBounds }) => (
+            <>
+              <Bar points={points.AWAKE} chartBounds={chartBounds} color="#4CAF50"  />
+              <Bar
+                points={points.CORE}
+                chartBounds={chartBounds}
+                color="#2196F3"
+                roundedCorners={{ topLeft: 10, topRight: 10 }}
+              />
+              <Bar points={points.DEEP} chartBounds={chartBounds} color="#9C27B0" />
+              <Bar points={points.REM} chartBounds={chartBounds} color="#FF9800" />
+            </>
+          )}
+        </CartesianChart>
+      )}
     </View>
   );
 };

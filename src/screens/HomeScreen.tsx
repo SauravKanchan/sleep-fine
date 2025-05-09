@@ -849,7 +849,6 @@ const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={styles.title}>Sleep Data (Last 7 Days)</Text>
         {sleepData.length > 0 && <SleepChart data={sleepData} />}
 
         {error && (
