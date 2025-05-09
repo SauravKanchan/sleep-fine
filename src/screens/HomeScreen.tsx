@@ -1,0 +1,897 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
+import { initHealthKit, getSleepData } from '../services/healthkit';
+import { SleepSample } from '../types/sleep';
+import { Linking, Alert, Button } from 'react-native';
+// import SleepChart from '../components/SleepChart';
+
+
+const HomeScreen: React.FC = () => {
+  const [sleepData, setSleepData] = useState<SleepSample[]>([
+  {
+    "id": "83D319C0-5090-422A-B62B-52E7E127CE68",
+    "value": "CORE",
+    "startDate": "2025-05-09T07:17:31.497+0100",
+    "endDate": "2025-05-09T07:21:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "3202C286-2900-4D4E-886F-38D35C59B797",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T06:03:01.497+0100",
+    "endDate": "2025-05-09T07:17:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "72218726-B1D2-4134-A26C-2748DC95EDF7",
+    "value": "REM",
+    "startDate": "2025-05-09T05:20:31.497+0100",
+    "endDate": "2025-05-09T06:03:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "25E3A7F6-A4F7-42A6-8E00-DBC443E80DCF",
+    "value": "CORE",
+    "startDate": "2025-05-09T05:14:01.497+0100",
+    "endDate": "2025-05-09T05:20:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "25163436-1948-40C8-BFCC-48DCD86CE12B",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T05:12:31.497+0100",
+    "endDate": "2025-05-09T05:14:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "906C2731-4396-465E-BF3C-EC016E7EF08F",
+    "value": "CORE",
+    "startDate": "2025-05-09T05:11:01.497+0100",
+    "endDate": "2025-05-09T05:12:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "45DBAF8A-38E9-4426-8951-5D2C2F969193",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T05:10:01.497+0100",
+    "endDate": "2025-05-09T05:11:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5ABEA452-F5F3-44BE-92C4-DC88E59EDD08",
+    "value": "CORE",
+    "startDate": "2025-05-09T05:07:31.497+0100",
+    "endDate": "2025-05-09T05:10:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "E35D569F-CABE-4C51-A7F3-465E197E1E08",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T05:06:31.497+0100",
+    "endDate": "2025-05-09T05:07:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "43C2E64D-E375-46CC-92BF-9F7C95217A2D",
+    "value": "CORE",
+    "startDate": "2025-05-09T05:05:01.497+0100",
+    "endDate": "2025-05-09T05:06:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "31B16FAC-2A1D-4F90-BF37-02F001A1734A",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T05:01:31.497+0100",
+    "endDate": "2025-05-09T05:05:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "FA4F7AED-9551-40B7-AFF4-22EE616C2923",
+    "value": "CORE",
+    "startDate": "2025-05-09T04:58:01.497+0100",
+    "endDate": "2025-05-09T05:01:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "B69B9751-BA4A-4754-A295-0E00482014DB",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T04:57:01.497+0100",
+    "endDate": "2025-05-09T04:58:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "17D630C8-DCFC-4D2B-9389-C1DA22CEDC7C",
+    "value": "CORE",
+    "startDate": "2025-05-09T04:53:31.497+0100",
+    "endDate": "2025-05-09T04:57:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "AE5B3FD6-1CA8-4C89-A333-D5A8FCB7483E",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T04:21:31.497+0100",
+    "endDate": "2025-05-09T04:53:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "6A881113-1DD3-4C4A-83DD-620E44AF00E8",
+    "value": "CORE",
+    "startDate": "2025-05-09T04:20:01.497+0100",
+    "endDate": "2025-05-09T04:21:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5A9836B4-275F-464A-A79D-D0D64FADE8BC",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T04:18:31.497+0100",
+    "endDate": "2025-05-09T04:20:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "A663D7AC-4613-4985-A043-FF9977C0B525",
+    "value": "CORE",
+    "startDate": "2025-05-09T04:15:31.497+0100",
+    "endDate": "2025-05-09T04:18:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "4461ADF8-E8BB-4636-A7C0-5373B7F4699D",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T04:14:31.497+0100",
+    "endDate": "2025-05-09T04:15:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "63ECB599-56EE-44F4-A442-83389FE1760C",
+    "value": "CORE",
+    "startDate": "2025-05-09T04:12:01.497+0100",
+    "endDate": "2025-05-09T04:14:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "D56C3E0B-46EE-4775-9AF4-3D856E0B9D5E",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T04:09:31.497+0100",
+    "endDate": "2025-05-09T04:12:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "F9FC9371-96D8-46B9-A9A7-874558B1AB1F",
+    "value": "DEEP",
+    "startDate": "2025-05-09T03:44:31.497+0100",
+    "endDate": "2025-05-09T04:09:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "B32DB8AB-30DB-46F4-B758-10B8AFD8B095",
+    "value": "CORE",
+    "startDate": "2025-05-09T03:10:31.497+0100",
+    "endDate": "2025-05-09T03:44:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "92D3ECF0-7DCC-4EA8-9D56-544D78F62D80",
+    "value": "REM",
+    "startDate": "2025-05-09T02:48:01.497+0100",
+    "endDate": "2025-05-09T03:10:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5AD2A46B-C639-4B47-B976-01B6E9D07293",
+    "value": "CORE",
+    "startDate": "2025-05-09T02:39:01.497+0100",
+    "endDate": "2025-05-09T02:48:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "8566497C-1ED2-4A2F-A925-C1BC73F1BD23",
+    "value": "DEEP",
+    "startDate": "2025-05-09T02:09:31.497+0100",
+    "endDate": "2025-05-09T02:39:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "FB019CFE-F8A2-4FFB-ADB9-0E5E46C82E7B",
+    "value": "CORE",
+    "startDate": "2025-05-09T01:52:01.497+0100",
+    "endDate": "2025-05-09T02:09:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "02DF76F7-402E-4FA4-AD2E-76D18A28145D",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T01:51:01.497+0100",
+    "endDate": "2025-05-09T01:52:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "1103A106-E786-48FF-A703-A7B049DAEB5F",
+    "value": "CORE",
+    "startDate": "2025-05-09T01:31:01.497+0100",
+    "endDate": "2025-05-09T01:51:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5E96FBC2-1526-48E0-8678-2241655A5A24",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T01:29:31.497+0100",
+    "endDate": "2025-05-09T01:31:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "22D49202-9D01-4B33-9863-9E26974AC857",
+    "value": "CORE",
+    "startDate": "2025-05-09T01:21:01.497+0100",
+    "endDate": "2025-05-09T01:29:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "511E2DF4-930C-416A-A4F6-00F8F297DF59",
+    "value": "AWAKE",
+    "startDate": "2025-05-09T01:19:31.497+0100",
+    "endDate": "2025-05-09T01:21:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "1EC49993-D66A-45A1-9303-A70E82F38C33",
+    "value": "CORE",
+    "startDate": "2025-05-09T01:13:01.497+0100",
+    "endDate": "2025-05-09T01:19:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "4B6531C8-6A51-4467-9E91-B4B7CB63EC18",
+    "value": "DEEP",
+    "startDate": "2025-05-09T00:53:31.497+0100",
+    "endDate": "2025-05-09T01:13:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "EE53DA77-1E5C-47BE-8ED4-B7E9FBFD4F6B",
+    "value": "CORE",
+    "startDate": "2025-05-09T00:50:01.497+0100",
+    "endDate": "2025-05-09T00:53:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "4C6290A0-8EFD-460E-9951-AD1C613B1CED",
+    "value": "DEEP",
+    "startDate": "2025-05-09T00:39:31.497+0100",
+    "endDate": "2025-05-09T00:50:01.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "8BD73E06-E2CC-478A-807E-75529D3EF2EA",
+    "value": "CORE",
+    "startDate": "2025-05-09T00:28:01.497+0100",
+    "endDate": "2025-05-09T00:39:31.497+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "A8EBE3F9-8791-4F3E-BF15-47BB261D7835",
+    "value": "CORE",
+    "startDate": "2025-05-05T01:44:53.719+0100",
+    "endDate": "2025-05-05T02:30:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "6477A4B8-5C2C-4744-ADE8-A8C97A5204A4",
+    "value": "AWAKE",
+    "startDate": "2025-05-05T01:43:23.719+0100",
+    "endDate": "2025-05-05T01:44:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "1D2E6D37-BB27-4FDB-A6CB-9FF31DB8A81A",
+    "value": "CORE",
+    "startDate": "2025-05-05T01:42:53.719+0100",
+    "endDate": "2025-05-05T01:43:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5488D9BE-EB33-4316-8DD1-9A55A31910F7",
+    "value": "REM",
+    "startDate": "2025-05-05T01:32:23.719+0100",
+    "endDate": "2025-05-05T01:42:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "40596818-D340-4E0C-8DDB-7FE1B172038B",
+    "value": "AWAKE",
+    "startDate": "2025-05-05T01:31:23.719+0100",
+    "endDate": "2025-05-05T01:32:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "EFA304EB-71AB-443D-AFD4-037168929664",
+    "value": "REM",
+    "startDate": "2025-05-05T01:13:53.719+0100",
+    "endDate": "2025-05-05T01:31:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "415A4229-4152-45DD-BCD8-E36B21F084A8",
+    "value": "CORE",
+    "startDate": "2025-05-05T00:09:53.719+0100",
+    "endDate": "2025-05-05T01:13:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "C48C10CC-AB07-4071-B2EF-9CBA50ADD1ED",
+    "value": "AWAKE",
+    "startDate": "2025-05-05T00:09:23.719+0100",
+    "endDate": "2025-05-05T00:09:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "2D533398-0B98-4EC9-A071-D2C227CB163D",
+    "value": "CORE",
+    "startDate": "2025-05-05T00:08:53.719+0100",
+    "endDate": "2025-05-05T00:09:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "FACA9A72-E007-4C21-A00F-2A8539FE1084",
+    "value": "REM",
+    "startDate": "2025-05-05T00:07:53.719+0100",
+    "endDate": "2025-05-05T00:08:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "F1A669C0-1491-4052-8CF0-35AD2273D133",
+    "value": "CORE",
+    "startDate": "2025-05-05T00:02:23.719+0100",
+    "endDate": "2025-05-05T00:07:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "233642C7-D4F4-4D8B-BE26-C75708B34302",
+    "value": "AWAKE",
+    "startDate": "2025-05-05T00:01:23.719+0100",
+    "endDate": "2025-05-05T00:02:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "0DE89311-382B-46CD-A9BC-480D8CDA8FE9",
+    "value": "CORE",
+    "startDate": "2025-05-04T23:59:23.719+0100",
+    "endDate": "2025-05-05T00:01:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "3DEDBE09-4E56-4E79-838D-C7F750FE35FE",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T23:58:23.719+0100",
+    "endDate": "2025-05-04T23:59:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "48492DCD-BBB7-4567-B2E7-C6E9BA9E3ACD",
+    "value": "CORE",
+    "startDate": "2025-05-04T23:57:53.719+0100",
+    "endDate": "2025-05-04T23:58:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "94533F0A-4BF5-43A2-8DEB-E36FB1F5F48C",
+    "value": "DEEP",
+    "startDate": "2025-05-04T23:41:23.719+0100",
+    "endDate": "2025-05-04T23:57:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "F28F26FA-A45E-4790-8B97-B313CD0846D6",
+    "value": "CORE",
+    "startDate": "2025-05-04T23:06:53.719+0100",
+    "endDate": "2025-05-04T23:41:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "8C25BE44-D6E6-4D56-9FB9-1132E06AB760",
+    "value": "DEEP",
+    "startDate": "2025-05-04T23:06:23.719+0100",
+    "endDate": "2025-05-04T23:06:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "038C7B97-C434-4CB3-8EB2-C8EA02814FFA",
+    "value": "CORE",
+    "startDate": "2025-05-04T22:39:23.719+0100",
+    "endDate": "2025-05-04T23:06:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "BDE32744-1C77-4316-A8F2-847FD343A2DA",
+    "value": "REM",
+    "startDate": "2025-05-04T22:32:53.719+0100",
+    "endDate": "2025-05-04T22:39:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "45536548-A059-4FC3-9F63-91EDDFF7AB2D",
+    "value": "CORE",
+    "startDate": "2025-05-04T22:22:23.719+0100",
+    "endDate": "2025-05-04T22:32:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "EA29590D-91E1-45F4-B3E7-9E0803E2C46B",
+    "value": "DEEP",
+    "startDate": "2025-05-04T22:15:53.719+0100",
+    "endDate": "2025-05-04T22:22:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "38D4B6DE-A703-4A15-B247-BBC0B82FE2C3",
+    "value": "CORE",
+    "startDate": "2025-05-04T22:03:23.719+0100",
+    "endDate": "2025-05-04T22:15:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "F7930F21-7C83-4EB1-AF02-EEC7A5A1F3FC",
+    "value": "DEEP",
+    "startDate": "2025-05-04T22:00:53.719+0100",
+    "endDate": "2025-05-04T22:03:23.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "DDBCD21F-8F29-4121-AE2B-357D17E6D08A",
+    "value": "CORE",
+    "startDate": "2025-05-04T21:44:53.719+0100",
+    "endDate": "2025-05-04T22:00:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "3EB93240-836A-4688-AAF9-F415AC0B9C0A",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T21:41:53.719+0100",
+    "endDate": "2025-05-04T21:44:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "E210818B-0559-42F7-9FB6-D48E23F28D32",
+    "value": "CORE",
+    "startDate": "2025-05-04T21:25:53.719+0100",
+    "endDate": "2025-05-04T21:41:53.719+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "9CF99A55-3851-46DA-BAE6-D6594695DF46",
+    "value": "CORE",
+    "startDate": "2025-05-04T01:49:06.190+0100",
+    "endDate": "2025-05-04T02:38:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "F1C4AC7F-1E16-4F35-9AE2-B197486F06A4",
+    "value": "REM",
+    "startDate": "2025-05-04T01:37:06.190+0100",
+    "endDate": "2025-05-04T01:49:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "8DF99104-BFAA-4D1F-B714-B9407C8A4E8B",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T01:35:36.190+0100",
+    "endDate": "2025-05-04T01:37:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "29A5F507-AA36-4D17-A6B0-68126A25F576",
+    "value": "REM",
+    "startDate": "2025-05-04T01:32:36.190+0100",
+    "endDate": "2025-05-04T01:35:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "D3A539C4-D9DE-4D22-A1B3-773BE8788D4F",
+    "value": "CORE",
+    "startDate": "2025-05-04T01:32:06.190+0100",
+    "endDate": "2025-05-04T01:32:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "45B5E59F-C135-4E0B-8098-CF438CE52366",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T01:26:36.190+0100",
+    "endDate": "2025-05-04T01:32:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5EE375CD-D0A0-46F1-8BF7-440794D43642",
+    "value": "REM",
+    "startDate": "2025-05-04T01:24:36.190+0100",
+    "endDate": "2025-05-04T01:26:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "9529E50E-D48A-4AB1-AB3A-CCE2E20D2DF2",
+    "value": "CORE",
+    "startDate": "2025-05-04T01:24:06.190+0100",
+    "endDate": "2025-05-04T01:24:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "AE927FEB-44D3-4798-A1D9-7AC9DBB7EFBF",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T01:23:06.190+0100",
+    "endDate": "2025-05-04T01:24:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "5A2AB0EA-DE46-4FB3-ADD7-2F48D11EB6A2",
+    "value": "REM",
+    "startDate": "2025-05-04T01:21:06.190+0100",
+    "endDate": "2025-05-04T01:23:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "BAD803D6-2BE2-4DFD-9E18-44FE2F62A932",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T01:20:36.190+0100",
+    "endDate": "2025-05-04T01:21:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "E0C17FFD-B02B-414F-9D64-A117A990B735",
+    "value": "REM",
+    "startDate": "2025-05-04T01:15:36.190+0100",
+    "endDate": "2025-05-04T01:20:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "C2EF3EAD-6912-4EAF-A611-24CDC9FFC772",
+    "value": "CORE",
+    "startDate": "2025-05-04T01:08:06.190+0100",
+    "endDate": "2025-05-04T01:15:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "9176F50B-2972-4731-B17B-EEC2B2FB6FFE",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T01:04:36.190+0100",
+    "endDate": "2025-05-04T01:08:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "23595618-F82E-4BBC-8BE4-FCC3091789C2",
+    "value": "CORE",
+    "startDate": "2025-05-04T00:15:36.190+0100",
+    "endDate": "2025-05-04T01:04:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "8CE092FF-76B7-4487-9505-4BA42B7F243D",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T00:11:36.190+0100",
+    "endDate": "2025-05-04T00:15:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "56233F48-A160-458D-B8D6-BFC59980D79A",
+    "value": "CORE",
+    "startDate": "2025-05-04T00:10:06.190+0100",
+    "endDate": "2025-05-04T00:11:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "D9D854A8-9951-4116-B89F-AA5C349AA32D",
+    "value": "AWAKE",
+    "startDate": "2025-05-04T00:01:36.190+0100",
+    "endDate": "2025-05-04T00:10:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "B1E952B9-6951-4206-A400-1F28A36EF644",
+    "value": "CORE",
+    "startDate": "2025-05-04T00:00:06.190+0100",
+    "endDate": "2025-05-04T00:01:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "BD050AEF-0249-47C3-B5CE-7570E97678B1",
+    "value": "AWAKE",
+    "startDate": "2025-05-03T23:58:36.190+0100",
+    "endDate": "2025-05-04T00:00:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "727328F5-D9F4-488F-AF0E-B8D642840880",
+    "value": "CORE",
+    "startDate": "2025-05-03T23:56:36.190+0100",
+    "endDate": "2025-05-03T23:58:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "54C3A574-2992-4CFC-A08F-CEAC90757AC2",
+    "value": "AWAKE",
+    "startDate": "2025-05-03T23:42:36.190+0100",
+    "endDate": "2025-05-03T23:56:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "3C69B87E-5829-48EC-AA6F-B19A27030795",
+    "value": "CORE",
+    "startDate": "2025-05-03T23:28:06.190+0100",
+    "endDate": "2025-05-03T23:42:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "3459C30C-824C-4E23-AFCC-6542992D3B5C",
+    "value": "DEEP",
+    "startDate": "2025-05-03T23:26:06.190+0100",
+    "endDate": "2025-05-03T23:28:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "E5BB8160-62C6-48CE-9EC2-17EFF72D1468",
+    "value": "CORE",
+    "startDate": "2025-05-03T22:32:06.190+0100",
+    "endDate": "2025-05-03T23:26:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "C9F9E651-FB06-4687-89F3-80D8F8FEDFFF",
+    "value": "AWAKE",
+    "startDate": "2025-05-03T22:31:06.190+0100",
+    "endDate": "2025-05-03T22:32:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "4E65055C-E1F8-406A-9387-5D7873B36381",
+    "value": "CORE",
+    "startDate": "2025-05-03T22:19:36.190+0100",
+    "endDate": "2025-05-03T22:31:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "1D4AF6D8-9C25-4EFD-AC32-EE68396D0EA7",
+    "value": "AWAKE",
+    "startDate": "2025-05-03T22:18:06.190+0100",
+    "endDate": "2025-05-03T22:19:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "205A9875-C1FC-4192-A590-F86404D2A9EB",
+    "value": "CORE",
+    "startDate": "2025-05-03T22:11:06.190+0100",
+    "endDate": "2025-05-03T22:18:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "83B5974C-D913-4DAE-A5E6-3B3BA223D096",
+    "value": "AWAKE",
+    "startDate": "2025-05-03T22:09:36.190+0100",
+    "endDate": "2025-05-03T22:11:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "7A97F565-A6A8-42D1-94B6-5BA740F171EC",
+    "value": "REM",
+    "startDate": "2025-05-03T22:03:36.190+0100",
+    "endDate": "2025-05-03T22:09:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "479F3B1C-818E-4A65-BE4F-7C869A1EFA0E",
+    "value": "CORE",
+    "startDate": "2025-05-03T22:02:36.190+0100",
+    "endDate": "2025-05-03T22:03:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "1F901F9D-DA64-4E47-868C-D548497AE8AD",
+    "value": "REM",
+    "startDate": "2025-05-03T22:00:06.190+0100",
+    "endDate": "2025-05-03T22:02:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "A5E444D0-95AE-47FD-8CCD-F083DFB11FFF",
+    "value": "CORE",
+    "startDate": "2025-05-03T21:33:36.190+0100",
+    "endDate": "2025-05-03T22:00:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "562DB00E-9469-46F3-AC53-0F74C6DEBF18",
+    "value": "DEEP",
+    "startDate": "2025-05-03T21:16:06.190+0100",
+    "endDate": "2025-05-03T21:33:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "B3F7F55D-E533-4D79-8F53-10331D5781F4",
+    "value": "CORE",
+    "startDate": "2025-05-03T21:12:36.190+0100",
+    "endDate": "2025-05-03T21:16:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "6D6F508C-A05D-40D6-B9CA-5C14EF48B9FD",
+    "value": "DEEP",
+    "startDate": "2025-05-03T21:00:06.190+0100",
+    "endDate": "2025-05-03T21:12:36.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  },
+  {
+    "id": "6DA494CA-26ED-411E-AB02-1464DDE59478",
+    "value": "CORE",
+    "startDate": "2025-05-03T20:49:06.190+0100",
+    "endDate": "2025-05-03T21:00:06.190+0100",
+    "sourceName": "Soham’s Apple Watch",
+    "sourceId": "com.apple.health.19DAF83A-C03E-4989-A9EA-E338794A8E90"
+  }
+]);
+
+  const [error, setError] = useState<string | null>(null);
+
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await initHealthKit();
+        const start = new Date();
+        start.setDate(start.getDate() - 7);
+        const data = await getSleepData(start);
+        setSleepData(data);
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const openSettings = () => {
+    Linking.openURL('app-settings:');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Text style={styles.title}>Sleep Data (Last 7 Days)</Text>
+        {/* {sleepData.length > 0 && <SleepChart data={sleepData} />} */}
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <Button title="Open Settings" onPress={openSettings} />
+          </View>
+        )}
+
+        {!error && sleepData.length === 0 && (
+          <Text style={styles.infoText}>
+            No sleep data available. Make sure 'Sleep Analysis' is enabled for this app in the Health app.
+          </Text>
+        )}
+
+        {sleepData.map((entry, index) => (
+          <View key={index} style={styles.card}>
+            <Text>Start: {entry.startDate}</Text>
+            <Text>End: {entry.endDate}</Text>
+            <Text>Value: {entry.value}</Text>
+            {entry.sourceName && <Text>Source: {entry.sourceName}</Text>}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
+  errorContainer: { marginVertical: 10 },
+  errorText: { color: 'red', marginBottom: 8 },
+  infoText: { fontStyle: 'italic', marginBottom: 16 },
+  card: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+});
+
+export default HomeScreen;
