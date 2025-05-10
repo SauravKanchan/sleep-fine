@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { CartesianChart, Bar } from 'victory-native';
+import { CartesianChart, StackedBar } from 'victory-native';
 import { SleepSample } from '../types/sleep';
 import { useFont, Canvas, Text as T } from '@shopify/react-native-skia';
 import { Platform } from 'react-native';
@@ -18,6 +18,7 @@ interface ChartDatum {
 
 const SleepChart: React.FC<Props> = ({ data }) => {
   let chartRawData: { [key: string]: any } = {};
+  const [roundedCorner] = useState(10);
   data.forEach((entry) => {
     const start = new Date(entry.startDate).getTime();
     const end = new Date(entry.endDate).getTime();
@@ -27,6 +28,14 @@ const SleepChart: React.FC<Props> = ({ data }) => {
       day: 'numeric',
     });
     const d = { x: dateLabel, y: hours };
+    if (
+      entry['value'] !== 'AWAKE' &&
+      entry['value'] !== 'CORE' &&
+      entry['value'] !== 'DEEP' &&
+      entry['value'] !== 'REM'
+    ) {
+      console.error('Invalid sleep type:', entry['value']);
+    }
 
     if (!chartRawData[dateLabel]) {
       chartRawData[dateLabel] = {
@@ -46,7 +55,6 @@ const SleepChart: React.FC<Props> = ({ data }) => {
     DEEP: value['DEEP'] / (60 * 60 * 1000),
     REM: value['REM'] / (60 * 60 * 1000),
   }));
-  console.log('chartData', chartData);
   const screenWidth = Dimensions.get('window').width;
   const font = useFont(NotoSansJPRegular, 12, (err) => {
     console.error('Font loading error:', err);
@@ -67,39 +75,31 @@ const SleepChart: React.FC<Props> = ({ data }) => {
           axisOptions={{
             font,
           }}
-          domainPadding={{ left: 70, right: 70, top: 30 }}
+          domainPadding={{ left: 70, right: 70, top: 150 }}
         >
           {({ points, chartBounds }) => (
             <>
-              <Bar
-                barWidth={40}
-                points={points.AWAKE}
+              <StackedBar
+                barWidth={45}
+                points={[points.AWAKE, points.CORE, points.DEEP, points.REM]}
                 chartBounds={chartBounds}
-                color="#4CAF50"
                 animate={{ type: 'spring', duration: 1000 }}
-              />
-              <Bar
-                barWidth={40}
-                points={points.CORE}
-                chartBounds={chartBounds}
-                color="#2196F3"
-                roundedCorners={{ topLeft: 5, topRight: 5 }}
-                animate={{ type: 'spring', duration: 1000 }}
-              />
-              <Bar
-                barWidth={40}
-                points={points.DEEP}
-                chartBounds={chartBounds}
-                color="#9C27B0"
-                animate={{ type: 'spring', duration: 1000 }}
-              />
-
-              <Bar
-                barWidth={40}
-                points={points.REM}
-                chartBounds={chartBounds}
-                color="#FF9800"
-                animate={{ type: 'spring', duration: 1000 }}
+                barOptions={({ isBottom, isTop }) => {
+                  // 👇 customize each individual bar as desired
+                  return {
+                    roundedCorners: isTop
+                      ? {
+                          topLeft: roundedCorner,
+                          topRight: roundedCorner,
+                        }
+                      : isBottom
+                      ? {
+                          bottomRight: roundedCorner,
+                          bottomLeft: roundedCorner,
+                        }
+                      : undefined,
+                  };
+                }}
               />
             </>
           )}

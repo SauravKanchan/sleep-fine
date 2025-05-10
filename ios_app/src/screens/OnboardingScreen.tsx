@@ -64,7 +64,11 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
       </Text>
       {/* {!permissionsGranted && ( */}
       <Button title="1. Grant Permissions" onPress={() => grantPermissions()} />
-      <Button title="2. Deposit" onPress={() => navigation.replace('SelectChallengeScreen')} />
+      <Button
+        title="2. Start Challenge"
+        onPress={() => navigation.replace('SelectChallengeScreen')}
+      />
+      <Button title="3. Past Sleep" onPress={() => navigation.replace('Home')} />
       {/* )} */}
       {/* <Button title="Get Started" onPress={() => navigation.replace('Home')} /> */}
       {/* <AppKitButton />

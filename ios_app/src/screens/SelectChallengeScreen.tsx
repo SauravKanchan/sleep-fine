@@ -19,16 +19,19 @@ import { type Provider } from '@reown/appkit-scaffold-utils-react-native';
 import contractData from '../services/contractData.json';
 import { ethers } from 'ethers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const presetOptions = [7, 21, 'Custom'] as const;
 
 const SelectChallengeScreen: React.FC = () => {
+  // @ts-ignore
   const { walletProvider } = useAppKitProvider<Provider>('eip155');
   const [selectedOption, setSelectedOption] = useState<number | 'Custom' | null>(null);
   const [customDays, setCustomDays] = useState('');
   const [balance, setBalance] = useState<string | null>(null);
   const [stakeAmount, setStakeAmount] = useState('0.01');
-
+  // @ts-ignore
+  const navigation = useNavigation();
   const { isConnected } = useAppKitAccount();
 
   const getDays = (): number | null => {
@@ -70,16 +73,11 @@ const SelectChallengeScreen: React.FC = () => {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
-      const tx = await contract.startChallenge(days, ethers.ZeroAddress, {
-        value: ethers.parseEther(stakeAmount),
-        type: 2,
-      });
-      const data = await tx.wait();
-      console.log('Transaction data:', data, tx);
+
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
     } catch (e) {
-      console.error("Staking error:", e);
-      Alert.alert("Error", "Something went wrong during staking.");
+      console.error('Staking error:', e);
+      Alert.alert('Error', 'Something went wrong during staking.');
     }
   };
 
@@ -95,10 +93,22 @@ const SelectChallengeScreen: React.FC = () => {
       ) : (
         <View style={{ flex: 1 }}>
           <View style={styles.walletHeader}>
-            <Text style={styles.balanceText}>
-              {balance ? `${parseFloat(balance).toFixed(4)} WND` : '... WND'}
-            </Text>
-            <AppKitButton />
+            <TouchableOpacity
+              style={styles.navTitleContainer}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate('Onboarding');
+              }}
+            >
+              <Text style={styles.navTitle}>SleepFine</Text>
+            </TouchableOpacity>
+
+            <View style={styles.walletInfo}>
+              <Text style={styles.balanceText}>
+                {balance ? `${parseFloat(balance).toFixed(4)} WND` : '... WND'}
+              </Text>
+              <AppKitButton />
+            </View>
           </View>
 
           <View style={styles.content}>
@@ -170,6 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 100,
     paddingHorizontal: 20,
+    backgroundColor: '#f9f9f9',
   },
   centeredWalletContainer: {
     flex: 1,
@@ -177,10 +188,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   walletHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  navTitleContainer: {
+    marginBottom: 12,
+  },
+  navTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#5A67D8',
+    textAlign: 'center',
+  },
+  walletInfo: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 4,
   },
   balanceText: {
     fontSize: 16,
@@ -191,7 +216,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
     marginBottom: 28,
     textAlign: 'center',
@@ -202,8 +227,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
-    elevation: 3, // Android
-    shadowColor: '#000', // iOS
+    elevation: 3,
+    shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
@@ -226,7 +251,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
   },
   optionSelected: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5A67D8',
   },
   optionText: {
     fontSize: 15,
@@ -246,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fefefe',
   },
   stakeButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5A67D8',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
