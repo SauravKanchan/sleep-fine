@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,26 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-
-import { AppKitButton, useAppKitAccount } from '@reown/appkit-ethers-react-native';
+import { Contract, BrowserProvider } from 'ethers';
+import {
+  AppKitButton,
+  useAppKitAccount,
+  useAppKitProvider,
+} from '@reown/appkit-ethers-react-native';
+import { type Provider } from '@reown/appkit-scaffold-utils-react-native';
+import contractData from '../services/contractData.json';
+import { ethers } from 'ethers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const presetOptions = [7, 21, 'Custom'] as const;
 
 const SelectChallengeScreen: React.FC = () => {
+  // @ts-ignore
+  const { walletProvider } = useAppKitProvider<Provider>('eip155');
   const [selectedOption, setSelectedOption] = useState<number | 'Custom' | null>(null);
   const [customDays, setCustomDays] = useState('');
+  const [balance, setBalance] = useState<string | null>(null);
+  const [stakeAmount, setStakeAmount] = useState('0.01');
 
   const { isConnected } = useAppKitAccount();
 
@@ -28,14 +40,47 @@ const SelectChallengeScreen: React.FC = () => {
     return typeof selectedOption === 'number' ? selectedOption : null;
   };
 
-  const handleStake = () => {
+  const fetchBalance = async () => {
+    if (isConnected && walletProvider) {
+      const ethersProvider = new BrowserProvider(walletProvider);
+      const signer = await ethersProvider.getSigner();
+      const rawBalance = await ethersProvider.getBalance(await signer.getAddress());
+      setBalance(ethers.formatEther(rawBalance));
+    }
+  };
+
+  useEffect(() => {
+    fetchBalance();
+  }, [isConnected, walletProvider]);
+
+  const handleStake = async () => {
     const days = getDays();
-    if (!days) {
-      Alert.alert('Invalid', 'Please enter a valid number of days.');
+    const parsedAmount = parseFloat(stakeAmount);
+
+    if (!days || isNaN(parsedAmount) || parsedAmount <= 0) {
+      Alert.alert('Invalid', 'Please enter a valid number of days and amount.');
       return;
     }
 
-    Alert.alert('Challenge Started', `You committed to ${days} days!`);
+    try {
+      const ethersProvider = new BrowserProvider(walletProvider);
+      const signer = await ethersProvider.getSigner();
+      const address = contractData.address;
+      const abi = contractData.abi;
+      const contract = new Contract(address, abi, signer);
+
+      const id = await contract.startChallenge.staticCall(days, ethers.ZeroAddress, {
+        value: ethers.parseEther(stakeAmount),
+      });
+
+      await AsyncStorage.setItem('challengeId', id.toString());
+      await fetchBalance();
+
+      Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
+    } catch (e) {
+      console.error("Staking error:", e);
+      Alert.alert("Error", "Something went wrong during staking.");
+    }
   };
 
   return (
@@ -49,12 +94,19 @@ const SelectChallengeScreen: React.FC = () => {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-          <View style={styles.topWalletContainer}>
+          {/* Header row */}
+          <View style={styles.walletHeader}>
+            <Text style={styles.balanceText}>
+              {balance ? `${parseFloat(balance).toFixed(4)} WND` : '... WND'}
+            </Text>
             <AppKitButton />
           </View>
 
+          {/* Challenge UI */}
           <View style={styles.content}>
-            <Text style={styles.title}>Select Your Challenge Duration</Text>
+            <Text style={styles.title}>Start a Challenge</Text>
+
+            <Text style={styles.label}>Select Duration</Text>
             <View style={styles.optionsContainer}>
               {presetOptions.map((opt, idx) => {
                 const isSelected = selectedOption === opt;
@@ -73,22 +125,31 @@ const SelectChallengeScreen: React.FC = () => {
             </View>
 
             {selectedOption === 'Custom' && (
-              <TextInput
-                style={styles.input}
-                placeholder="Enter number of days"
-                keyboardType="numeric"
-                value={customDays}
-                onChangeText={setCustomDays}
-              />
+              <>
+                <Text style={styles.label}>Custom Duration (Days)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter number of days"
+                  keyboardType="numeric"
+                  value={customDays}
+                  onChangeText={setCustomDays}
+                />
+              </>
             )}
 
+            <Text style={styles.label}>Amount to Stake (ETH)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="e.g. 0.01"
+              keyboardType="decimal-pad"
+              value={stakeAmount}
+              onChangeText={setStakeAmount}
+            />
+
             <TouchableOpacity
-              style={[
-                styles.stakeButton,
-                !getDays() && styles.stakeButtonDisabled,
-              ]}
+              style={[styles.stakeButton, (!getDays() || !stakeAmount) && styles.stakeButtonDisabled]}
               onPress={handleStake}
-              disabled={!getDays()}
+              disabled={!getDays() || !stakeAmount}
             >
               <Text style={styles.stakeButtonText}>Stake</Text>
             </TouchableOpacity>
@@ -102,7 +163,7 @@ const SelectChallengeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 100,
     paddingHorizontal: 24,
   },
   centeredWalletContainer: {
@@ -110,27 +171,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  topWalletContainer: {
-    position: 'absolute',
-    top: 20,
-    right: 0,
-    paddingRight: 12,
-    zIndex: 10,
+  walletHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  balanceText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 28,
     textAlign: 'center',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+    marginTop: 16,
   },
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   optionButton: {
     paddingVertical: 12,
@@ -156,13 +226,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    marginBottom: 20,
   },
   stakeButton: {
     backgroundColor: '#4CAF50',
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: 10,
     alignItems: 'center',
+    marginTop: 32,
   },
   stakeButtonDisabled: {
     backgroundColor: '#ccc',
@@ -173,6 +243,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
 
 export default SelectChallengeScreen;

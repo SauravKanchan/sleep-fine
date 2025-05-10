@@ -43,7 +43,7 @@ const westend = {
   currency: 'WND',
   explorerUrl: 'https://westend.subscan.io',
   rpcUrl: 'https://westend-asset-hub-eth-rpc.polkadot.io',
-}
+};
 
 const chains = [mainnet, polygon, westend];
 
