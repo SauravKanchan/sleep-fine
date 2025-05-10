@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
-import { initHealthKit, getSleepData } from '../services/healthkit';
+import { getSleepData } from '../services/healthkit';
 import { SleepSample } from '../types/sleep';
 import { Linking, Alert, Button } from 'react-native';
 import SleepChart from '../components/SleepChart';
@@ -830,7 +830,6 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await initHealthKit();
         const start = new Date();
         start.setDate(start.getDate() - 10);
         const data = await getSleepData(start);

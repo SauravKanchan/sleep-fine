@@ -15,7 +15,6 @@ const healthKitOptions: any = {
  * Initializes Apple HealthKit with the required permissions.
  */
 export const initHealthKit = (): Promise<boolean> => {
-  console.log({ AppleHealthKit });
   return new Promise((resolve, reject) => {
     AppleHealthKit.initHealthKit(healthKitOptions, (error: string) => {
       if (error) {

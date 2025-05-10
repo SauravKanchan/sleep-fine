@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator';
 import { AppKitButton } from '@reown/appkit-ethers-react-native';
+import { initHealthKit } from '../services/healthkit';
 import notifee from '@notifee/react-native';
+import { AuthorizationStatus } from '@notifee/react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 async function onDisplayNotification() {
@@ -32,23 +34,48 @@ async function onDisplayNotification() {
 }
 
 const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
+  const [permissionsGranted, setPermissionsGranted] = useState(false);
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const settings = await notifee.getNotificationSettings();
+      if (settings.authorizationStatus == AuthorizationStatus.AUTHORIZED) {
+        setPermissionsGranted(true);
+      }
+    };
+
+    checkPermissions();
+  });
+
+  async function grantPermissions() {
+    // Request permissions (required for iOS)
+    const { authorizationStatus } = await notifee.requestPermission();
+    await initHealthKit();
+    if (authorizationStatus === AuthorizationStatus.AUTHORIZED) {
+      setPermissionsGranted(true);
+    } else {
+      console.log('Permission denied');
+    }
+  }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to slpf5</Text>
+      <Text style={styles.title}>Welcome to SleepFine</Text>
       <Text style={styles.subtitle}>
         Either you sleep fine or pay sleep fine. We are here to help you sleep fine.
       </Text>
-      <Button title="Get Started" onPress={() => navigation.replace('Home')} />
-      <AppKitButton />
-      <Button title="Display Notification" onPress={() => onDisplayNotification()} />
+      {!permissionsGranted && (
+        <Button title="Grant Permissions" onPress={() => grantPermissions()} />
+      )}
+      {/* <Button title="Get Started" onPress={() => navigation.replace('Home')} /> */}
+      {/* <AppKitButton />
+      <Button title="Display Notification" onPress={() => onDisplayNotification()} /> */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 24 },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 16 },
-  subtitle: { fontSize: 16, marginBottom: 32 },
+  title: { fontSize: 30, fontWeight: 'bold', marginBottom: 16 },
+  subtitle: { fontSize: 18, marginBottom: 32 },
 });
 
 export default OnboardingScreen;
