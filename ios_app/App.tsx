@@ -37,7 +37,15 @@ const polygon = {
   rpcUrl: 'https://polygon-rpc.com',
 };
 
-const chains = [mainnet, polygon];
+const westend = {
+  chainId: 420420421,
+  name: 'Westend',
+  currency: 'WND',
+  explorerUrl: 'https://westend.subscan.io',
+  rpcUrl: 'https://westend-asset-hub-eth-rpc.polkadot.io',
+}
+
+const chains = [mainnet, polygon, westend];
 
 // 4. Create modal
 createAppKit({
@@ -45,6 +53,7 @@ createAppKit({
   chains,
   config,
   enableAnalytics: true, // Optional - defaults to your Cloud configuration
+  defaultChain: westend, // Optional - defaults to the first chain in your list
 });
 
 export default function App() {

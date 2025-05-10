@@ -18,7 +18,7 @@ const SelectChallengeScreen: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<number | 'Custom' | null>(null);
   const [customDays, setCustomDays] = useState('');
 
-  const { isConnected, address, caipAddress, status, embeddedWalletInfo } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
 
   const getDays = (): number | null => {
     if (selectedOption === 'Custom') {
@@ -36,7 +36,6 @@ const SelectChallengeScreen: React.FC = () => {
     }
 
     Alert.alert('Challenge Started', `You committed to ${days} days!`);
-    // TODO: Trigger contract or backend logic
   };
 
   return (
@@ -44,55 +43,95 @@ const SelectChallengeScreen: React.FC = () => {
       behavior={Platform.select({ ios: 'padding', android: undefined })}
       style={styles.container}
     >
-      <Text style={styles.title}>Select Your Challenge Duration</Text>
-      <View style={styles.optionsContainer}>
-        {presetOptions.map((opt, idx) => {
-          const isSelected = selectedOption === opt;
-          return (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.optionButton, isSelected && styles.optionSelected]}
-              onPress={() => setSelectedOption(opt)}
-            >
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
-                {typeof opt === 'number' ? `${opt} Days` : 'Custom'}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {selectedOption === 'Custom' && (
-        <TextInput
-          style={styles.input}
-          placeholder="Enter number of days"
-          keyboardType="numeric"
-          value={customDays}
-          onChangeText={setCustomDays}
-        />
-      )}
-
-      {!isConnected && (
-        <View style={styles.walletButtonContainer}>
+      {!isConnected ? (
+        <View style={styles.centeredWalletContainer}>
           <AppKitButton />
         </View>
-      )}
+      ) : (
+        <View style={{ flex: 1 }}>
+          <View style={styles.topWalletContainer}>
+            <AppKitButton />
+          </View>
 
-      <TouchableOpacity
-        style={[styles.stakeButton, (!getDays() || !isConnected) && styles.stakeButtonDisabled]}
-        onPress={handleStake}
-        disabled={!getDays() || !isConnected}
-      >
-        <Text style={styles.stakeButtonText}>Stake</Text>
-      </TouchableOpacity>
+          <View style={styles.content}>
+            <Text style={styles.title}>Select Your Challenge Duration</Text>
+            <View style={styles.optionsContainer}>
+              {presetOptions.map((opt, idx) => {
+                const isSelected = selectedOption === opt;
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={[styles.optionButton, isSelected && styles.optionSelected]}
+                    onPress={() => setSelectedOption(opt)}
+                  >
+                    <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                      {typeof opt === 'number' ? `${opt} Days` : 'Custom'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {selectedOption === 'Custom' && (
+              <TextInput
+                style={styles.input}
+                placeholder="Enter number of days"
+                keyboardType="numeric"
+                value={customDays}
+                onChangeText={setCustomDays}
+              />
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.stakeButton,
+                !getDays() && styles.stakeButtonDisabled,
+              ]}
+              onPress={handleStake}
+              disabled={!getDays()}
+            >
+              <Text style={styles.stakeButtonText}>Stake</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  optionsContainer: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 },
+  container: {
+    flex: 1,
+    paddingTop: 60,
+    paddingHorizontal: 24,
+  },
+  centeredWalletContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topWalletContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 0,
+    paddingRight: 12,
+    zIndex: 10,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
   optionButton: {
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -119,10 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  walletButtonContainer: {
-    marginVertical: 20,
-    alignItems: 'center',
-  },
   stakeButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 14,
@@ -138,5 +173,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
 
 export default SelectChallengeScreen;
