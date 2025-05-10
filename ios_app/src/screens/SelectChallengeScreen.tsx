@@ -23,7 +23,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const presetOptions = [7, 21, 'Custom'] as const;
 
 const SelectChallengeScreen: React.FC = () => {
-  // @ts-ignore
   const { walletProvider } = useAppKitProvider<Provider>('eip155');
   const [selectedOption, setSelectedOption] = useState<number | 'Custom' | null>(null);
   const [customDays, setCustomDays] = useState('');
@@ -65,9 +64,7 @@ const SelectChallengeScreen: React.FC = () => {
     try {
       const ethersProvider = new BrowserProvider(walletProvider);
       const signer = await ethersProvider.getSigner();
-      const address = contractData.address;
-      const abi = contractData.abi;
-      const contract = new Contract(address, abi, signer);
+      const contract = new Contract(contractData.address, contractData.abi, signer);
 
       const id = await contract.startChallenge.staticCall(days, ethers.ZeroAddress, {
         value: ethers.parseEther(stakeAmount),
@@ -94,7 +91,6 @@ const SelectChallengeScreen: React.FC = () => {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-          {/* Header row */}
           <View style={styles.walletHeader}>
             <Text style={styles.balanceText}>
               {balance ? `${parseFloat(balance).toFixed(4)} WND` : '... WND'}
@@ -102,52 +98,58 @@ const SelectChallengeScreen: React.FC = () => {
             <AppKitButton />
           </View>
 
-          {/* Challenge UI */}
           <View style={styles.content}>
             <Text style={styles.title}>Start a Challenge</Text>
 
-            <Text style={styles.label}>Select Duration</Text>
-            <View style={styles.optionsContainer}>
-              {presetOptions.map((opt, idx) => {
-                const isSelected = selectedOption === opt;
-                return (
-                  <TouchableOpacity
-                    key={idx}
-                    style={[styles.optionButton, isSelected && styles.optionSelected]}
-                    onPress={() => setSelectedOption(opt)}
-                  >
-                    <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
-                      {typeof opt === 'number' ? `${opt} Days` : 'Custom'}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+            <View style={styles.card}>
+              <Text style={styles.cardLabel}>Select Duration</Text>
+              <View style={styles.optionsContainer}>
+                {presetOptions.map((opt, idx) => {
+                  const isSelected = selectedOption === opt;
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.optionButton, isSelected && styles.optionSelected]}
+                      onPress={() => setSelectedOption(opt)}
+                    >
+                      <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                        {typeof opt === 'number' ? `${opt} Days` : 'Custom'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {selectedOption === 'Custom' && (
+                <>
+                  <Text style={styles.cardLabel}>Custom Duration (Days)</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter number of days"
+                    keyboardType="numeric"
+                    value={customDays}
+                    onChangeText={setCustomDays}
+                  />
+                </>
+              )}
             </View>
 
-            {selectedOption === 'Custom' && (
-              <>
-                <Text style={styles.label}>Custom Duration (Days)</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter number of days"
-                  keyboardType="numeric"
-                  value={customDays}
-                  onChangeText={setCustomDays}
-                />
-              </>
-            )}
-
-            <Text style={styles.label}>Amount to Stake (ETH)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 0.01"
-              keyboardType="decimal-pad"
-              value={stakeAmount}
-              onChangeText={setStakeAmount}
-            />
+            <View style={styles.card}>
+              <Text style={styles.cardLabel}>Amount to Stake (ETH)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. 0.01"
+                keyboardType="decimal-pad"
+                value={stakeAmount}
+                onChangeText={setStakeAmount}
+              />
+            </View>
 
             <TouchableOpacity
-              style={[styles.stakeButton, (!getDays() || !stakeAmount) && styles.stakeButtonDisabled]}
+              style={[
+                styles.stakeButton,
+                (!getDays() || !stakeAmount) && styles.stakeButtonDisabled,
+              ]}
               onPress={handleStake}
               disabled={!getDays() || !stakeAmount}
             >
@@ -164,7 +166,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 100,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
   },
   centeredWalletContainer: {
     flex: 1,
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   balanceText: {
     fontSize: 16,
@@ -187,32 +189,44 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 28,
     textAlign: 'center',
+    color: '#1a1a1a',
   },
-  label: {
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 3, // Android
+    shadowColor: '#000', // iOS
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  cardLabel: {
     fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 8,
-    marginTop: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#444',
   },
   optionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   optionButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    backgroundColor: '#f0f0f0',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#f2f2f2',
   },
   optionSelected: {
     backgroundColor: '#4CAF50',
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
   },
   optionTextSelected: {
@@ -222,17 +236,18 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     fontSize: 16,
+    backgroundColor: '#fefefe',
   },
   stakeButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 16,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 10,
   },
   stakeButtonDisabled: {
     backgroundColor: '#ccc',
