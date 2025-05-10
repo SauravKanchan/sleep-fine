@@ -832,7 +832,7 @@ const HomeScreen: React.FC = () => {
       try {
         await initHealthKit();
         const start = new Date();
-        start.setDate(start.getDate() - 7);
+        start.setDate(start.getDate() - 10);
         const data = await getSleepData(start);
         // setSleepData(data); // For testing
       } catch (err) {

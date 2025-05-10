@@ -53,7 +53,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
   });
   return (
     <View style={{ height: 300, padding: 20, backgroundColor: 'white' }}>
-      <Text style={styles.title}>Sleep Trend (Last 7 Days)</Text>
+      <Text style={styles.title}>Sleep Trend (Last 10 Days)</Text>
       {data.length === 0 && (
         <Text style={{ textAlign: 'center', fontSize: 16, color: '#888' }}>
           No sleep data available
@@ -71,15 +71,36 @@ const SleepChart: React.FC<Props> = ({ data }) => {
         >
           {({ points, chartBounds }) => (
             <>
-              <Bar points={points.AWAKE} chartBounds={chartBounds} color="#4CAF50"  />
               <Bar
+                barWidth={40}
+                points={points.AWAKE}
+                chartBounds={chartBounds}
+                color="#4CAF50"
+                animate={{ type: 'spring' , duration: 1000}}
+              />
+              <Bar
+                barWidth={40}
                 points={points.CORE}
                 chartBounds={chartBounds}
                 color="#2196F3"
-                roundedCorners={{ topLeft: 10, topRight: 10 }}
+                roundedCorners={{ topLeft: 5, topRight: 5 }}
+                animate={{ type: 'spring' , duration: 1000}}
               />
-              <Bar points={points.DEEP} chartBounds={chartBounds} color="#9C27B0" />
-              <Bar points={points.REM} chartBounds={chartBounds} color="#FF9800" />
+              <Bar
+                barWidth={40}
+                points={points.DEEP}
+                chartBounds={chartBounds}
+                color="#9C27B0"
+                animate={{ type: 'spring' , duration: 1000}}
+              />
+
+              <Bar
+                barWidth={40}
+                points={points.REM}
+                chartBounds={chartBounds}
+                color="#FF9800"
+                animate={{ type: 'spring' , duration: 1000}}
+              />
             </>
           )}
         </CartesianChart>
