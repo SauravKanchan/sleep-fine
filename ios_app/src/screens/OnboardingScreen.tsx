@@ -63,8 +63,8 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         Either you sleep fine or pay sleep fine. We are here to help you sleep fine.
       </Text>
       {/* {!permissionsGranted && ( */}
-        <Button title="1. Grant Permissions" onPress={() => grantPermissions()} />
-        <Button title="2. Deposit" onPress={() => navigation.replace('SelectChallengeScreen')} />
+      <Button title="1. Grant Permissions" onPress={() => grantPermissions()} />
+      <Button title="2. Deposit" onPress={() => navigation.replace('SelectChallengeScreen')} />
       {/* )} */}
       {/* <Button title="Get Started" onPress={() => navigation.replace('Home')} /> */}
       {/* <AppKitButton />

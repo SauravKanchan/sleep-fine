@@ -10,12 +10,16 @@ import {
   Alert,
 } from 'react-native';
 
+import { AppKitButton, useAppKitAccount } from '@reown/appkit-ethers-react-native';
+
 const presetOptions = [7, 21, 'Custom'] as const;
 
 const SelectChallengeScreen: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<number | 'Custom' | null>(null);
   const [customDays, setCustomDays] = useState('');
-  
+
+  const { isConnected, address, caipAddress, status, embeddedWalletInfo } = useAppKitAccount();
+
   const getDays = (): number | null => {
     if (selectedOption === 'Custom') {
       const days = parseInt(customDays, 10);
@@ -32,7 +36,7 @@ const SelectChallengeScreen: React.FC = () => {
     }
 
     Alert.alert('Challenge Started', `You committed to ${days} days!`);
-    // Proceed to next step (staking flow)
+    // TODO: Trigger contract or backend logic
   };
 
   return (
@@ -68,13 +72,16 @@ const SelectChallengeScreen: React.FC = () => {
         />
       )}
 
+      {!isConnected && (
+        <View style={styles.walletButtonContainer}>
+          <AppKitButton />
+        </View>
+      )}
+
       <TouchableOpacity
-        style={[
-          styles.stakeButton,
-          !getDays() && styles.stakeButtonDisabled,
-        ]}
+        style={[styles.stakeButton, (!getDays() || !isConnected) && styles.stakeButtonDisabled]}
         onPress={handleStake}
-        disabled={!getDays()}
+        disabled={!getDays() || !isConnected}
       >
         <Text style={styles.stakeButtonText}>Stake</Text>
       </TouchableOpacity>
@@ -111,6 +118,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     marginBottom: 20,
+  },
+  walletButtonContainer: {
+    marginVertical: 20,
+    alignItems: 'center',
   },
   stakeButton: {
     backgroundColor: '#4CAF50',
