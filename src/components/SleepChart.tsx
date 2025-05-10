@@ -76,7 +76,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
                 points={points.AWAKE}
                 chartBounds={chartBounds}
                 color="#4CAF50"
-                animate={{ type: 'spring' , duration: 1000}}
+                animate={{ type: 'spring', duration: 1000 }}
               />
               <Bar
                 barWidth={40}
@@ -84,14 +84,14 @@ const SleepChart: React.FC<Props> = ({ data }) => {
                 chartBounds={chartBounds}
                 color="#2196F3"
                 roundedCorners={{ topLeft: 5, topRight: 5 }}
-                animate={{ type: 'spring' , duration: 1000}}
+                animate={{ type: 'spring', duration: 1000 }}
               />
               <Bar
                 barWidth={40}
                 points={points.DEEP}
                 chartBounds={chartBounds}
                 color="#9C27B0"
-                animate={{ type: 'spring' , duration: 1000}}
+                animate={{ type: 'spring', duration: 1000 }}
               />
 
               <Bar
@@ -99,7 +99,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
                 points={points.REM}
                 chartBounds={chartBounds}
                 color="#FF9800"
-                animate={{ type: 'spring' , duration: 1000}}
+                animate={{ type: 'spring', duration: 1000 }}
               />
             </>
           )}

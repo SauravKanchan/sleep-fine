@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator';
+import { AppKitButton } from '@reown/appkit-ethers-react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
@@ -13,6 +14,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         This app reads your Apple Health sleep data to help you track your rest over time.
       </Text>
       <Button title="Get Started" onPress={() => navigation.replace('Home')} />
+      <AppKitButton />
     </View>
   );
 };
