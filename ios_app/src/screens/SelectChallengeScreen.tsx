@@ -62,17 +62,20 @@ const SelectChallengeScreen: React.FC = () => {
     }
 
     try {
+      // @ts-ignore
       const ethersProvider = new BrowserProvider(walletProvider);
       const signer = await ethersProvider.getSigner();
       const contract = new Contract(contractData.address, contractData.abi, signer);
-
       const id = await contract.startChallenge.staticCall(days, ethers.ZeroAddress, {
         value: ethers.parseEther(stakeAmount),
       });
-
       await AsyncStorage.setItem('challengeId', id.toString());
-      await fetchBalance();
-
+      const tx = await contract.startChallenge(days, ethers.ZeroAddress, {
+        value: ethers.parseEther(stakeAmount),
+        type: 2,
+      });
+      const data = await tx.wait();
+      console.log('Transaction data:', data, tx);
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
     } catch (e) {
       console.error("Staking error:", e);
