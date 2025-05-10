@@ -19,7 +19,7 @@ async function onDisplayNotification() {
   // Display a notification
   await notifee.displayNotification({
     title: 'Sleep fast',
-    body: 'If you don\'t sleep fast, you will pay sleep fine',
+    body: "If you don't sleep fast, you will pay sleep fine",
     android: {
       channelId,
       smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
@@ -29,20 +29,8 @@ async function onDisplayNotification() {
       },
     },
   });
-
-  
 }
 
-let count = 0;
-const maxCount = 15;
-const intervalId = setInterval(() => {
-  if (count < maxCount) {
-    onDisplayNotification();
-    count++;
-  } else {
-    clearInterval(intervalId); // Stop the interval after 5 executions
-  }
-}, 5000);
 const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
