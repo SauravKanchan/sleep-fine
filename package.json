@@ -12,11 +12,17 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-clipboard/clipboard": "^1.16.2",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/native-stack": "^7.3.12",
+    "@reown/appkit-auth-ethers-react-native": "^1.2.3",
+    "@reown/appkit-ethers5-react-native": "^1.2.3",
+    "@reown/appkit-siwe-react-native": "^1.2.3",
     "@shopify/react-native-skia": "^2.0.0",
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0",
+    "ethers": "^5.8.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "^2.25.0",
