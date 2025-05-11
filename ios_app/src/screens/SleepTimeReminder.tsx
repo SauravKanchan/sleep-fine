@@ -12,27 +12,31 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
 const SLEEP_TIME_KEY = 'sleep_time';
+const WARNING_TIME_KEY = 'warning_time';
 
 const SetSleepTime: React.FC = () => {
   const [sleepTime, setSleepTime] = useState<Date | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
+  const [warningTime, setWarningTime] = useState<Date | null>(null);
+  const [showSleepPicker, setShowSleepPicker] = useState(false);
+  const [showWarningPicker, setShowWarningPicker] = useState(false);
+  // @ts-ignore
   const navigation = useNavigation();
 
   useEffect(() => {
-    const loadTime = async () => {
+    const loadTimes = async () => {
       try {
-        const stored = await AsyncStorage.getItem(SLEEP_TIME_KEY);
-        if (stored) {
-          setSleepTime(new Date(stored));
-        }
+        const sleepStored = await AsyncStorage.getItem(SLEEP_TIME_KEY);
+        const warningStored = await AsyncStorage.getItem(WARNING_TIME_KEY);
+        if (sleepStored) setSleepTime(new Date(sleepStored));
+        if (warningStored) setWarningTime(new Date(warningStored));
       } catch (e) {
-        console.error('Failed to load sleep time:', e);
+        console.error('Failed to load times:', e);
       }
     };
-    loadTime();
+    loadTimes();
   }, []);
 
-  const handleChange = async (event: any, selectedDate?: Date) => {
+  const handleSleepChange = async (event: any, selectedDate?: Date) => {
     if (event.type === 'set' && selectedDate) {
       setSleepTime(selectedDate);
       try {
@@ -41,7 +45,19 @@ const SetSleepTime: React.FC = () => {
         console.error('Failed to save sleep time:', e);
       }
     }
-    setShowPicker(false); // hide picker after processing
+    setShowSleepPicker(false);
+  };
+
+  const handleWarningChange = async (event: any, selectedDate?: Date) => {
+    if (event.type === 'set' && selectedDate) {
+      setWarningTime(selectedDate);
+      try {
+        await AsyncStorage.setItem(WARNING_TIME_KEY, selectedDate.toISOString());
+      } catch (e) {
+        console.error('Failed to save warning time:', e);
+      }
+    }
+    setShowWarningPicker(false);
   };
 
   const timeString = (date: Date) =>
@@ -50,36 +66,65 @@ const SetSleepTime: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.navHeader}>
-        <Text style={styles.navTitle} onPress={()=> {
-          // @ts-ignore
-          navigation.navigate('Onboarding');
-        }}>SleepFine</Text>
+        <Text
+          style={styles.navTitle}
+          onPress={() => {
+            // @ts-ignore
+            navigation.navigate('Onboarding');
+          }}
+        >
+          SleepFine
+        </Text>
       </View>
 
       <View style={styles.centerContainer}>
+        {/* Sleep Time Card */}
         <View style={styles.card}>
           <Text style={styles.title}>🛏️ Sleep Time</Text>
-
           {sleepTime ? (
             <Text style={styles.timeText}>Your set time: {timeString(sleepTime)}</Text>
           ) : (
             <Text style={styles.timeText}>No time set yet</Text>
           )}
-
-          <TouchableOpacity style={styles.setButton} onPress={() => setShowPicker(true)}>
+          <TouchableOpacity style={styles.setButton} onPress={() => setShowSleepPicker(true)}>
             <Text style={styles.setButtonText}>
               {sleepTime ? 'Edit Time' : 'Set Time'}
             </Text>
           </TouchableOpacity>
-
-          {showPicker && (
+          {showSleepPicker && (
             <View style={styles.pickerContainer}>
               <DateTimePicker
                 value={sleepTime || new Date()}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleChange}
-                themeVariant="light" // 👈 fixes gray-on-gray in dark mode
+                onChange={handleSleepChange}
+                themeVariant="light"
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Warning Time Card */}
+        <View style={styles.card}>
+          <Text style={styles.title}>⏰ Warning Time</Text>
+          {warningTime ? (
+            <Text style={styles.timeText}>Reminder set for: {timeString(warningTime)}</Text>
+          ) : (
+            <Text style={styles.timeText}>No warning time set</Text>
+          )}
+          <TouchableOpacity style={styles.setButton} onPress={() => setShowWarningPicker(true)}>
+            <Text style={styles.setButtonText}>
+              {warningTime ? 'Edit Warning' : 'Set Warning'}
+            </Text>
+          </TouchableOpacity>
+          {showWarningPicker && (
+            <View style={styles.pickerContainer}>
+              <DateTimePicker
+                value={warningTime || new Date()}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleWarningChange}
+                themeVariant="light"
               />
             </View>
           )}
@@ -123,6 +168,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     alignItems: 'center',
+    marginBottom: 24,
   },
   title: {
     fontSize: 20,
