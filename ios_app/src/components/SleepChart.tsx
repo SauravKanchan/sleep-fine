@@ -1,21 +1,50 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { CartesianChart, StackedBar } from 'victory-native';
 import { SleepSample } from '../types/sleep';
 import { useFont } from '@shopify/react-native-skia';
 import { useNavigation } from '@react-navigation/native';
 // @ts-ignore
 import NotoSansJPRegular from '../assets/fonts/NotoSansJPRegular.ttf';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
   data: SleepSample[];
 }
 
 const SleepChart: React.FC<Props> = ({ data }) => {
-  let chartRawData: { [key: string]: any } = {};
+  const chartRawData: { [key: string]: any } = {};
   const [roundedCorner] = useState(10);
+  const [goalSleepTime, setGoalSleepTime] = useState<Date | null>(null);
+  const [todayStatus, setTodayStatus] = useState<'✅ On Track' | '❌ Missed' | null>(null);
   // @ts-ignore
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const loadSleepGoal = async () => {
+      const stored = await AsyncStorage.getItem('sleep_time');
+      if (stored) {
+        const goal = new Date(stored);
+        setGoalSleepTime(goal);
+
+        // Determine today’s goal status
+        const now = new Date();
+        const todayGoal = new Date(now);
+        todayGoal.setHours(goal.getHours());
+        todayGoal.setMinutes(goal.getMinutes());
+        todayGoal.setSeconds(0);
+
+        setTodayStatus(now <= todayGoal ? '✅ On Track' : '❌ Missed');
+      }
+    };
+    loadSleepGoal();
+  }, []);
 
   data.forEach((entry) => {
     const start = new Date(entry.startDate).getTime();
@@ -50,39 +79,41 @@ const SleepChart: React.FC<Props> = ({ data }) => {
     REM: value.REM / (60 * 60 * 1000),
   }));
 
-  const lastEntry = Object.entries(chartRawData).sort(
-    ([a], [b]) => chartRawData[b].end - chartRawData[a].end,
-  )[0];
+  const sortedEntries = Object.entries(chartRawData).sort(
+    ([, a], [, b]) => b.end - a.end
+  );
 
   const font = useFont(NotoSansJPRegular, 12, (err) => {
     console.error('Font loading error:', err);
   });
 
-  const renderLastSleepCard = () => {
-    if (!lastEntry) return null;
-    const [_, details] = lastEntry;
-    const start = new Date(details.start);
-    const end = new Date(details.end);
-    const durationHrs = ((details.end - details.start) / (1000 * 60 * 60)).toFixed(2);
+  const renderSleepCards = () =>
+    sortedEntries.map(([dateLabel, details], idx) => {
+      const start = new Date(details.start);
+      const end = new Date(details.end);
+      const durationHrs = ((details.end - details.start) / (1000 * 60 * 60)).toFixed(1);
 
-    return (
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Last Sleep Recorded</Text>
-        <Text style={styles.cardItem}>
-          💤 Went to bed: {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </Text>
-        <Text style={styles.cardItem}>⏱ Slept for: {durationHrs} hours</Text>
-        <Text style={styles.cardItem}>
-          📅 Day:{' '}
-          {start.toLocaleDateString(undefined, {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
-      </View>
-    );
-  };
+      const goalStatus =
+        goalSleepTime &&
+        (start.getHours() < goalSleepTime.getHours() ||
+          (start.getHours() === goalSleepTime.getHours() &&
+            start.getMinutes() <= goalSleepTime.getMinutes()))
+          ? '✅ Achieved'
+          : '⚠️ Missed';
+
+      return (
+        <View style={styles.recordCard} key={`${dateLabel}-${idx}`}>
+          <View style={styles.recordRow}>
+            <Text style={styles.recordLabel}>{dateLabel}</Text>
+            <Text style={[styles.statusText, goalStatus.includes('Achieved') ? styles.statusAchieved : styles.statusMissed]}>
+              {goalStatus}
+            </Text>
+          </View>
+          <Text style={styles.recordItem}>🛏 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+          <Text style={styles.recordItem}>⏱ {durationHrs} hrs</Text>
+        </View>
+      );
+    });
 
   return (
     <View style={styles.container}>
@@ -103,7 +134,19 @@ const SleepChart: React.FC<Props> = ({ data }) => {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Sleep Trend (Last 10 Days)</Text>
+        <Text style={styles.cardTitle}>📊 Sleep Trend (Last 10 Days)</Text>
+
+        {goalSleepTime && (
+          <View style={{ marginBottom: 12 }}>
+            <Text style={styles.goalText}>
+              Scheduled Sleep Time: {goalSleepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+            <Text style={[styles.goalStatus, todayStatus === '✅ On Track' ? styles.statusAchieved : styles.statusMissed]}>
+              Today's Goal: {todayStatus}
+            </Text>
+          </View>
+        )}
+
         {data.length === 0 ? (
           <Text style={styles.empty}>No sleep data available</Text>
         ) : (
@@ -117,20 +160,18 @@ const SleepChart: React.FC<Props> = ({ data }) => {
             >
               {({ points, chartBounds }) => (
                 <StackedBar
-                  barWidth={45}
+                  barWidth={35}
                   points={[points.AWAKE, points.CORE, points.DEEP, points.REM]}
                   chartBounds={chartBounds}
                   animate={{ type: 'spring', duration: 1000 }}
                   colors={['#718096', '#63B3ED', '#805AD5', '#F687B3']}
-                  barOptions={({ isBottom, isTop }) => {
-                    return {
-                      roundedCorners: isTop
-                        ? { topLeft: roundedCorner, topRight: roundedCorner }
-                        : isBottom
-                        ? { bottomRight: roundedCorner, bottomLeft: roundedCorner }
-                        : undefined,
-                    };
-                  }}
+                  barOptions={({ isBottom, isTop }) => ({
+                    roundedCorners: isTop
+                      ? { topLeft: roundedCorner, topRight: roundedCorner }
+                      : isBottom
+                      ? { bottomRight: roundedCorner, bottomLeft: roundedCorner }
+                      : undefined,
+                  })}
                 />
               )}
             </CartesianChart>
@@ -138,7 +179,9 @@ const SleepChart: React.FC<Props> = ({ data }) => {
         )}
       </View>
 
-      {renderLastSleepCard()}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {renderSleepCards()}
+      </ScrollView>
     </View>
   );
 };
@@ -189,10 +232,49 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#333',
   },
-  cardItem: {
+  goalText: {
     fontSize: 15,
+    fontWeight: '500',
     color: '#555',
+  },
+  goalStatus: {
+    fontSize: 15,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  scrollContainer: {
+    paddingBottom: 100,
+  },
+  recordCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    elevation: 2,
+  },
+  recordRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 4,
+  },
+  recordLabel: {
+    fontWeight: '600',
+    fontSize: 15,
+    color: '#444',
+  },
+  recordItem: {
+    fontSize: 14,
+    color: '#555',
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  statusAchieved: {
+    color: '#38A169',
+  },
+  statusMissed: {
+    color: '#E53E3E',
   },
 });
 

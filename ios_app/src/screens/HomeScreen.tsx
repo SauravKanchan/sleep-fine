@@ -833,7 +833,9 @@ const HomeScreen: React.FC = () => {
         const start = new Date();
         start.setDate(start.getDate() - 10);
         const data = await getSleepData(start);
-        // setSleepData(data); // For testing
+        // if (data.length !== 0) {
+          setSleepData(data); // For testing
+        // }
       } catch (err) {
         setError((err as Error).message);
       }
