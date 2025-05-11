@@ -7,31 +7,6 @@ import notifee from '@notifee/react-native';
 import { AuthorizationStatus } from '@notifee/react-native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
-async function onDisplayNotification() {
-  // Request permissions (required for iOS)
-  await notifee.requestPermission();
-
-  // Create a channel (required for Android)
-  const channelId = await notifee.createChannel({
-    id: 'default',
-    name: 'Default Channel',
-  });
-
-  // Display a notification
-  await notifee.displayNotification({
-    title: 'Sleep fast',
-    body: "If you don't sleep fast, you will pay sleep fine",
-    android: {
-      channelId,
-      smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
-      // pressAction is needed if you want the notification to open the app when pressed
-      pressAction: {
-        id: 'default',
-      },
-    },
-  });
-}
-
 const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [permissionsGranted, setPermissionsGranted] = useState(false);
   useEffect(() => {
@@ -48,6 +23,11 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   async function grantPermissions() {
     // Request permissions (required for iOS)
     const { authorizationStatus } = await notifee.requestPermission();
+    // Create a channel (required for Android)
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
     await initHealthKit();
     if (authorizationStatus === AuthorizationStatus.AUTHORIZED) {
       setPermissionsGranted(true);
@@ -72,9 +52,6 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         title="4. Sleep Time Reminder"
         onPress={() => navigation.replace('SleepTimeReminder')}
       />
-      {/* <Button title="Get Started" onPress={() => navigation.replace('Home')} /> */}
-      {/* <AppKitButton />
-      <Button title="Display Notification" onPress={() => onDisplayNotification()} /> */}
     </View>
   );
 };

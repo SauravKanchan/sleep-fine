@@ -73,11 +73,22 @@ const SelectChallengeScreen: React.FC = () => {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
-      const tx = await signer.sendTransaction({
-        to: '0x0C37C30Bb94517215E353C0351eAb8Eeb842d786',
+      const tx = await contract.startChallenge(days, ethers.ZeroAddress, {
         value: ethers.parseEther(stakeAmount),
-        type: 2,
+        type: 0,
       });
+      // const estimateGas = await ethersProvider.estimateGas({
+      //   from: await signer.getAddress(),
+      //   to: "0x0C37C30Bb94517215E353C0351eAb8Eeb842d786",
+      //   value: ethers.parseEther(stakeAmount),
+      // });
+      // console.log('Estimated gas:', estimateGas.toString());
+      // const tx = await signer.sendTransaction({
+      //   to: '0x0C37C30Bb94517215E353C0351eAb8Eeb842d786',
+      //   value: ethers.parseEther(stakeAmount),
+      //   type: 0,
+      //   gasLimit: estimateGas,
+      // });
       console.log('Transaction sent:', tx);
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
     } catch (e) {
@@ -117,7 +128,7 @@ const SelectChallengeScreen: React.FC = () => {
           </View>
 
           <View style={styles.content}>
-            <Text style={styles.title}>Start a Challenge 2</Text>
+            <Text style={styles.title}>Start a Challenge 3</Text>
             <View style={styles.card}>
               <Text style={styles.cardLabel}>Select Duration</Text>
               <View style={styles.optionsContainer}>
