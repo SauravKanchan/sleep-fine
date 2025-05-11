@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { CartesianChart, StackedBar } from 'victory-native';
 import { SleepSample } from '../types/sleep';
 import { useFont } from '@shopify/react-native-skia';
@@ -79,9 +73,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
     REM: value.REM / (60 * 60 * 1000),
   }));
 
-  const sortedEntries = Object.entries(chartRawData).sort(
-    ([, a], [, b]) => b.end - a.end
-  );
+  const sortedEntries = Object.entries(chartRawData).sort(([, a], [, b]) => b.end - a.end);
 
   const font = useFont(NotoSansJPRegular, 12, (err) => {
     console.error('Font loading error:', err);
@@ -105,11 +97,18 @@ const SleepChart: React.FC<Props> = ({ data }) => {
         <View style={styles.recordCard} key={`${dateLabel}-${idx}`}>
           <View style={styles.recordRow}>
             <Text style={styles.recordLabel}>{dateLabel}</Text>
-            <Text style={[styles.statusText, goalStatus.includes('Achieved') ? styles.statusAchieved : styles.statusMissed]}>
+            <Text
+              style={[
+                styles.statusText,
+                goalStatus.includes('Achieved') ? styles.statusAchieved : styles.statusMissed,
+              ]}
+            >
               {goalStatus}
             </Text>
           </View>
-          <Text style={styles.recordItem}>🛏 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+          <Text style={styles.recordItem}>
+            🛏 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Text>
           <Text style={styles.recordItem}>⏱ {durationHrs} hrs</Text>
         </View>
       );
@@ -139,9 +138,15 @@ const SleepChart: React.FC<Props> = ({ data }) => {
         {goalSleepTime && (
           <View style={{ marginBottom: 12 }}>
             <Text style={styles.goalText}>
-              Scheduled Sleep Time: {goalSleepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              Scheduled Sleep Time:{' '}
+              {goalSleepTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </Text>
-            <Text style={[styles.goalStatus, todayStatus === '✅ On Track' ? styles.statusAchieved : styles.statusMissed]}>
+            <Text
+              style={[
+                styles.goalStatus,
+                todayStatus === '✅ On Track' ? styles.statusAchieved : styles.statusMissed,
+              ]}
+            >
               Today's Goal: {todayStatus}
             </Text>
           </View>
@@ -179,9 +184,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {renderSleepCards()}
-      </ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>{renderSleepCards()}</ScrollView>
     </View>
   );
 };

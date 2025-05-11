@@ -1,0 +1,152 @@
+[
+  {
+    "address": "0x6eD8A1E023b2E3A5F947Cf7C51A61E89D31fC331",
+    "stake": 10458.27,
+    "uptime": 863920,
+    "location": "Frankfurt, Germany"
+  },
+  {
+    "address": "0x89B5F792fC7E19Ff0Cb8f35c53B64Fc7E63eF777",
+    "stake": 7853.56,
+    "uptime": 781223,
+    "location": "New York, USA"
+  },
+  {
+    "address": "0x4a27aABb6B23f96f8C31cF4E6d4b9C1E91c00003",
+    "stake": 9982.34,
+    "uptime": 925371,
+    "location": "Tokyo, Japan"
+  },
+  {
+    "address": "0xDca72F9Bb0899cAa9F53cF06A2a3ECAe1e4109c9",
+    "stake": 12000.00,
+    "uptime": 812443,
+    "location": "Toronto, Canada"
+  },
+  {
+    "address": "0x1fB6Cc8B2fEAeC489Cb2368E2BaFcAe7862Fe4Ee",
+    "stake": 6043.88,
+    "uptime": 711112,
+    "location": "Singapore"
+  },
+  {
+    "address": "0x3A29d7b9E0cE35B3d2Af85c72D2d86504D597776",
+    "stake": 8876.12,
+    "uptime": 899200,
+    "location": "Sydney, Australia"
+  },
+  {
+    "address": "0x755eE21E51721a28fF11bFf6b912B8072aFc79b2",
+    "stake": 9432.15,
+    "uptime": 912003,
+    "location": "Paris, France"
+  },
+  {
+    "address": "0x41Af7dD197F94A212Dd2Ec6f107Fd17EdbE2f22f",
+    "stake": 10568.44,
+    "uptime": 862001,
+    "location": "Helsinki, Finland"
+  },
+  {
+    "address": "0x9Fb11d6D195Bc99A8EaC5C87B924AEBA0Df55117",
+    "stake": 11200.67,
+    "uptime": 845330,
+    "location": "São Paulo, Brazil"
+  },
+  {
+    "address": "0x3b26D2f2EfD97C6DdF13e1cB9CbEd5c0d377bC88",
+    "stake": 7322.90,
+    "uptime": 745812,
+    "location": "Seoul, South Korea"
+  },
+  {
+    "address": "0xCd81D9Af70b81E9Bc76C13e2b847D3D9aE764Ba1",
+    "stake": 11450.30,
+    "uptime": 873221,
+    "location": "Amsterdam, Netherlands"
+  },
+  {
+    "address": "0xAef6c2B2b6F8E19a53cA3A5dCd3Ae0BdFb73Bb45",
+    "stake": 5903.22,
+    "uptime": 690003,
+    "location": "Nairobi, Kenya"
+  },
+  {
+    "address": "0xF77aC891Ef8715F7C24Aa6Fb6Af54dFD3e6aD1C4",
+    "stake": 10432.19,
+    "uptime": 900812,
+    "location": "Chicago, USA"
+  },
+  {
+    "address": "0x71e8919fD765Db6D96Cb35C2C4b3F6fD4fB1d023",
+    "stake": 9700.65,
+    "uptime": 810459,
+    "location": "London, UK"
+  },
+  {
+    "address": "0x29Dd51A8f2c4D7CbC4dC03Fb9B3A08C7F2B05B52",
+    "stake": 7602.17,
+    "uptime": 754199,
+    "location": "Delhi, India"
+  },
+  {
+    "address": "0x6214B05c212ECcfb7Bc779423A931eAEe9fE6C12",
+    "stake": 8504.89,
+    "uptime": 812776,
+    "location": "Zurich, Switzerland"
+  },
+  {
+    "address": "0x2c12b9A4Dd85e17E6312DAF8EeAd55bBbCdC7721",
+    "stake": 6783.00,
+    "uptime": 705421,
+    "location": "Dubai, UAE"
+  },
+  {
+    "address": "0xFb28d84bCdF44F93117372E9DA79288aC87042f8",
+    "stake": 10092.33,
+    "uptime": 876999,
+    "location": "Berlin, Germany"
+  },
+  {
+    "address": "0xAb31766eCe1Ecb8bFda13d56792f98c93b48DfA9",
+    "stake": 6933.90,
+    "uptime": 699345,
+    "location": "Beijing, China"
+  },
+  {
+    "address": "0x6B2a9d84D6E0cEd21c95A26508CdA9f77EAB3a36",
+    "stake": 11943.56,
+    "uptime": 911223,
+    "location": "Reykjavik, Iceland"
+  },
+  {
+    "address": "0x91B77CEb8d02b3F3aE30C3eABF7b5eBfe54bE51C",
+    "stake": 8231.24,
+    "uptime": 820443,
+    "location": "Bangkok, Thailand"
+  },
+  {
+    "address": "0xEa27f86b8ED6F5Aa60Da9B64AC88f1c3CEeA1436",
+    "stake": 8892.15,
+    "uptime": 865331,
+    "location": "Johannesburg, South Africa"
+  },
+  {
+    "address": "0x4Fb1B90Ac1A6E98B1EF5D94B77F7C7d4FA64d453",
+    "stake": 7410.00,
+    "uptime": 731923,
+    "location": "Kuala Lumpur, Malaysia"
+  },
+  {
+    "address": "0xDf019CD9f5Fb5c8B9C1c94DcD99d94a177F394Fb",
+    "stake": 9643.55,
+    "uptime": 884421,
+    "location": "Stockholm, Sweden"
+  },
+  {
+    "address": "0xAC83EaB8F88248E49f3D4931fC4Fd6F5f7f67161",
+    "stake": 10900.00,
+    "uptime": 892310,
+    "location": "Buenos Aires, Argentina"
+  }
+]

@@ -39,8 +39,8 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>😴 Welcome to SleepFine</Text>
       <Text style={styles.subtitle}>
-        Either you sleep fine or pay SleepFine.{"\n"}
-        💡 Track. 💰 Commit. 💤 Improve.{"\n\n"}
+        Either you sleep fine or pay SleepFine.{'\n'}
+        💡 Track. 💰 Commit. 💤 Improve.{'\n\n'}
         Let us help you build a healthy sleep habit — starting today!
       </Text>
 
@@ -55,10 +55,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.buttonText}>🔥 2. Start a Sleep Challenge</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.replace('Home')}
-      >
+      <TouchableOpacity style={styles.button} onPress={() => navigation.replace('Home')}>
         <Text style={styles.buttonText}>📊 3. View Sleep Stats</Text>
       </TouchableOpacity>
 

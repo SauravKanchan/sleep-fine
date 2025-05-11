@@ -44,11 +44,17 @@ const SelectChallengeScreen: React.FC = () => {
   };
 
   const fetchBalance = async () => {
-    if (isConnected && walletProvider) {
-      const ethersProvider = new BrowserProvider(walletProvider);
-      const signer = await ethersProvider.getSigner();
-      const rawBalance = await ethersProvider.getBalance(await signer.getAddress());
-      setBalance(ethers.formatEther(rawBalance));
+    try {
+      if (isConnected && walletProvider) {
+        const ethersProvider = new BrowserProvider(walletProvider);
+        // const ethersProvider = new ethers.JsonRpcProvider("https://westend-asset-hub-eth-rpc.polkadot.io");
+        const signer = await ethersProvider.getSigner();
+        console.log('Signer address:', await signer.getAddress());
+        const rawBalance = await ethersProvider.getBalance(await signer.getAddress());
+        setBalance(ethers.formatEther(rawBalance));
+      }
+    } catch (e) {
+      console.error('Error fetching balance:', e);
     }
   };
 
@@ -70,12 +76,15 @@ const SelectChallengeScreen: React.FC = () => {
       const ethersProvider = new BrowserProvider(walletProvider);
       const signer = await ethersProvider.getSigner();
       const contract = new Contract(contractData.address, contractData.abi, signer);
+      console.log('value', ethers.parseEther(stakeAmount));
       const id = await contract.startChallenge.staticCall(days, ethers.ZeroAddress, {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
       // fetch private key from AsyncStorage
+      console.log('Challenge ID:', id);
       const privateKey = await AsyncStorage.getItem('privateKey');
+      console.log({ privateKey });
       let appSigner;
       if (!privateKey) {
         appSigner = await ethers.Wallet.createRandom();
