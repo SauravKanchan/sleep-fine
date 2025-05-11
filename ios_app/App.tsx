@@ -9,9 +9,9 @@ const projectId = '121ab21ee37e0fb9df5dfd8dba9b4159';
 
 // 2. Create config
 const metadata = {
-  name: 'AppKit RN',
+  name: 'SleepFine',
   description: 'AppKit RN Example',
-  url: 'https://reown.com/appkit',
+  url: 'https://sleepfine.com/appkit',
   icons: ['https://avatars.githubusercontent.com/u/179229932'],
   redirect: {
     native: 'YOUR_APP_SCHEME://',

@@ -79,7 +79,7 @@ const SelectChallengeScreen: React.FC = () => {
         type: 0,
       });
       console.log('Transaction sent:', tx);
-      Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
+      Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} WND!`);
     } catch (e) {
       console.error('Staking error:', e);
       Alert.alert('Error', 'Something went wrong during staking.');
@@ -152,7 +152,7 @@ const SelectChallengeScreen: React.FC = () => {
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.cardLabel}>Amount to Stake (ETH)</Text>
+              <Text style={styles.cardLabel}>Amount to Stake (WND)</Text>
               <TextInput
                 style={styles.input}
                 placeholder="e.g. 0.01"
