@@ -11,7 +11,11 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import notifee, { TimestampTrigger, TriggerType, RepeatFrequency } from '@notifee/react-native';
+import notifee, {
+  TimestampTrigger,
+  TriggerType,
+  RepeatFrequency,
+} from '@notifee/react-native';
 
 const SLEEP_TIME_KEY = 'sleep_time';
 const WARNING_TIME_KEY = 'warning_time';
@@ -45,7 +49,12 @@ const SetSleepTime: React.FC = () => {
     loadTimes();
   }, []);
 
-  const scheduleNotification = async (date: Date, id: string, title: string, body: string) => {
+  const scheduleNotification = async (
+    date: Date,
+    id: string,
+    title: string,
+    body: string
+  ) => {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: date.getTime(),
@@ -61,7 +70,7 @@ const SetSleepTime: React.FC = () => {
           channelId: 'default',
         },
       },
-      trigger,
+      trigger
     );
   };
 
@@ -69,12 +78,20 @@ const SetSleepTime: React.FC = () => {
     try {
       setSleepTime(tempSleepTime);
       await AsyncStorage.setItem(SLEEP_TIME_KEY, tempSleepTime.toISOString());
-      await scheduleNotification(
-        tempSleepTime,
-        'sleep-time',
-        '😴 Time to Sleep',
-        'Your scheduled sleep time has arrived.',
-      );
+
+      const now = new Date();
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+      const selectedMinutes = tempSleepTime.getHours() * 60 + tempSleepTime.getMinutes();
+
+      if (selectedMinutes > nowMinutes) {
+        await scheduleNotification(
+          tempSleepTime,
+          'sleep-time',
+          '😴 Time to Sleep',
+          'Your scheduled sleep time has arrived.'
+        );
+      }
+
       Alert.alert('Success', 'Sleep time has been updated.');
     } catch (e) {
       console.error('Failed to save sleep time:', e);
@@ -86,12 +103,20 @@ const SetSleepTime: React.FC = () => {
     try {
       setWarningTime(tempWarningTime);
       await AsyncStorage.setItem(WARNING_TIME_KEY, tempWarningTime.toISOString());
-      await scheduleNotification(
-        tempWarningTime,
-        'warning-time',
-        '⏰ Bedtime Reminder',
-        'Your warning time before sleep is here.',
-      );
+
+      const now = new Date();
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+      const selectedMinutes = tempWarningTime.getHours() * 60 + tempWarningTime.getMinutes();
+
+      if (selectedMinutes > nowMinutes) {
+        await scheduleNotification(
+          tempWarningTime,
+          'warning-time',
+          '⏰ Bedtime Reminder',
+          'Your warning time before sleep is here.'
+        );
+      }
+
       Alert.alert('Success', 'Warning time has been updated.');
     } catch (e) {
       console.error('Failed to save warning time:', e);
@@ -104,7 +129,6 @@ const SetSleepTime: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <View style={styles.cardsWrapper}>
         {/* Sleep Time Card */}
         <View style={styles.card}>
@@ -134,7 +158,9 @@ const SetSleepTime: React.FC = () => {
             style={styles.setButton}
             onPress={() => setActivePicker('warning')}
           >
-            <Text style={styles.setButtonText}>{warningTime ? 'Edit Warning' : 'Set Warning'}</Text>
+            <Text style={styles.setButtonText}>
+              {warningTime ? 'Edit Warning' : 'Set Warning'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -179,15 +205,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9F9',
     padding: 16,
-  },
-  header: {
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  navTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#5A67D8',
   },
   cardsWrapper: {
     alignItems: 'center',
