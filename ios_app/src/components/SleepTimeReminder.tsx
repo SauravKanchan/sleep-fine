@@ -7,10 +7,10 @@ import {
   Platform,
   SafeAreaView,
   Alert,
+  Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
 import notifee, { TimestampTrigger, TriggerType, RepeatFrequency } from '@notifee/react-native';
 
 const SLEEP_TIME_KEY = 'sleep_time';
@@ -21,10 +21,7 @@ const SetSleepTime: React.FC = () => {
   const [warningTime, setWarningTime] = useState<Date | null>(null);
   const [tempSleepTime, setTempSleepTime] = useState<Date>(new Date());
   const [tempWarningTime, setTempWarningTime] = useState<Date>(new Date());
-  const [showSleepPicker, setShowSleepPicker] = useState(false);
-  const [showWarningPicker, setShowWarningPicker] = useState(false);
-  // @ts-ignore
-  const navigation = useNavigation();
+  const [activePicker, setActivePicker] = useState<'sleep' | 'warning' | null>(null);
 
   useEffect(() => {
     const loadTimes = async () => {
@@ -82,7 +79,7 @@ const SetSleepTime: React.FC = () => {
     } catch (e) {
       console.error('Failed to save sleep time:', e);
     }
-    setShowSleepPicker(false);
+    setActivePicker(null);
   };
 
   const saveWarningTime = async () => {
@@ -99,7 +96,7 @@ const SetSleepTime: React.FC = () => {
     } catch (e) {
       console.error('Failed to save warning time:', e);
     }
-    setShowWarningPicker(false);
+    setActivePicker(null);
   };
 
   const timeString = (date: Date) =>
@@ -107,19 +104,8 @@ const SetSleepTime: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.navHeader}>
-        <Text
-          style={styles.navTitle}
-          onPress={() => {
-            // @ts-ignore
-            navigation.navigate('Onboarding');
-          }}
-        >
-          SleepFine
-        </Text>
-      </View>
 
-      <View style={styles.centerContainer}>
+      <View style={styles.cardsWrapper}>
         {/* Sleep Time Card */}
         <View style={styles.card}>
           <Text style={styles.title}>🛏️ Sleep Time</Text>
@@ -128,23 +114,12 @@ const SetSleepTime: React.FC = () => {
           ) : (
             <Text style={styles.timeText}>No time set yet</Text>
           )}
-          <TouchableOpacity style={styles.setButton} onPress={() => setShowSleepPicker(true)}>
+          <TouchableOpacity
+            style={styles.setButton}
+            onPress={() => setActivePicker('sleep')}
+          >
             <Text style={styles.setButtonText}>{sleepTime ? 'Edit Time' : 'Set Time'}</Text>
           </TouchableOpacity>
-          {showSleepPicker && (
-            <View style={styles.pickerContainer}>
-              <DateTimePicker
-                value={tempSleepTime}
-                mode="time"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(e, d) => d && setTempSleepTime(d)}
-                themeVariant="light"
-              />
-              <TouchableOpacity style={styles.saveButton} onPress={saveSleepTime}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
 
         {/* Warning Time Card */}
@@ -155,25 +130,46 @@ const SetSleepTime: React.FC = () => {
           ) : (
             <Text style={styles.timeText}>No warning time set</Text>
           )}
-          <TouchableOpacity style={styles.setButton} onPress={() => setShowWarningPicker(true)}>
+          <TouchableOpacity
+            style={styles.setButton}
+            onPress={() => setActivePicker('warning')}
+          >
             <Text style={styles.setButtonText}>{warningTime ? 'Edit Warning' : 'Set Warning'}</Text>
           </TouchableOpacity>
-          {showWarningPicker && (
-            <View style={styles.pickerContainer}>
-              <DateTimePicker
-                value={tempWarningTime}
-                mode="time"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(e, d) => d && setTempWarningTime(d)}
-                themeVariant="light"
-              />
-              <TouchableOpacity style={styles.saveButton} onPress={saveWarningTime}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
       </View>
+
+      {/* Floating Modal Picker */}
+      <Modal
+        visible={!!activePicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setActivePicker(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.pickerOverlay}>
+            <DateTimePicker
+              value={activePicker === 'sleep' ? tempSleepTime : tempWarningTime}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(e, d) => {
+                if (d) {
+                  activePicker === 'sleep'
+                    ? setTempSleepTime(d)
+                    : setTempWarningTime(d);
+                }
+              }}
+              themeVariant="light"
+            />
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={activePicker === 'sleep' ? saveSleepTime : saveWarningTime}
+            >
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -182,24 +178,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9F9F9',
+    padding: 16,
   },
-  navHeader: {
-    paddingTop: 16,
-    paddingBottom: 12,
+  header: {
+    marginBottom: 24,
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-    backgroundColor: '#ffffff',
   },
   navTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
     color: '#5A67D8',
   },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  cardsWrapper: {
     alignItems: 'center',
+    gap: 20,
   },
   card: {
     backgroundColor: '#fff',
@@ -212,36 +204,43 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     alignItems: 'center',
-    marginBottom: 24,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 12,
     color: '#333',
+    textAlign: 'center',
   },
   timeText: {
-    fontSize: 16,
+    fontSize: 15,
     marginBottom: 16,
     color: '#555',
+    textAlign: 'center',
   },
   setButton: {
     backgroundColor: '#5A67D8',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
   },
   setButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
   },
-  pickerContainer: {
-    marginTop: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 10,
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  pickerOverlay: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    width: '80%',
   },
   saveButton: {
     marginTop: 10,
@@ -253,7 +252,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontWeight: '600',
-    fontSize: 15,
+    fontSize: 14,
   },
 });
 

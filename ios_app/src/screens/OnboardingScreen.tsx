@@ -62,13 +62,6 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.buttonText}>📊 3. View Sleep Stats</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.replace('SleepTimeReminder')}
-      >
-        <Text style={styles.buttonText}>⏰ 4. Sleep Time Reminder</Text>
-      </TouchableOpacity>
-
       <View style={styles.footerNote}>
         <Text style={styles.footerText}>💙 Sleep well, stay accountable!</Text>
       </View>

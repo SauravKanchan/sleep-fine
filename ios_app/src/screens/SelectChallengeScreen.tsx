@@ -20,6 +20,7 @@ import contractData from '../services/contractData.json';
 import { ethers } from 'ethers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import SetSleepTime from '../components/SleepTimeReminder';
 
 const presetOptions = [7, 21, 'Custom'] as const;
 
@@ -77,18 +78,6 @@ const SelectChallengeScreen: React.FC = () => {
         value: ethers.parseEther(stakeAmount),
         type: 0,
       });
-      // const estimateGas = await ethersProvider.estimateGas({
-      //   from: await signer.getAddress(),
-      //   to: "0x0C37C30Bb94517215E353C0351eAb8Eeb842d786",
-      //   value: ethers.parseEther(stakeAmount),
-      // });
-      // console.log('Estimated gas:', estimateGas.toString());
-      // const tx = await signer.sendTransaction({
-      //   to: '0x0C37C30Bb94517215E353C0351eAb8Eeb842d786',
-      //   value: ethers.parseEther(stakeAmount),
-      //   type: 0,
-      //   gasLimit: estimateGas,
-      // });
       console.log('Transaction sent:', tx);
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
     } catch (e) {
@@ -126,9 +115,9 @@ const SelectChallengeScreen: React.FC = () => {
               <AppKitButton />
             </View>
           </View>
-
+          <SetSleepTime />
           <View style={styles.content}>
-            <Text style={styles.title}>Start a Challenge 3</Text>
+            <Text style={styles.title}>Start a Challenge</Text>
             <View style={styles.card}>
               <Text style={styles.cardLabel}>Select Duration</Text>
               <View style={styles.optionsContainer}>
@@ -229,6 +218,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    marginTop: -80,
   },
   title: {
     fontSize: 24,
