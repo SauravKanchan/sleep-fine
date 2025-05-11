@@ -23,6 +23,8 @@ const WARNING_TIME_KEY = 'warning_time';
 const SetSleepTime: React.FC = () => {
   const [sleepTime, setSleepTime] = useState<Date | null>(null);
   const [warningTime, setWarningTime] = useState<Date | null>(null);
+  const [tempSleepTime, setTempSleepTime] = useState<Date>(new Date());
+  const [tempWarningTime, setTempWarningTime] = useState<Date>(new Date());
   const [showSleepPicker, setShowSleepPicker] = useState(false);
   const [showWarningPicker, setShowWarningPicker] = useState(false);
   // @ts-ignore
@@ -33,8 +35,16 @@ const SetSleepTime: React.FC = () => {
       try {
         const sleepStored = await AsyncStorage.getItem(SLEEP_TIME_KEY);
         const warningStored = await AsyncStorage.getItem(WARNING_TIME_KEY);
-        if (sleepStored) setSleepTime(new Date(sleepStored));
-        if (warningStored) setWarningTime(new Date(warningStored));
+        if (sleepStored) {
+          const date = new Date(sleepStored);
+          setSleepTime(date);
+          setTempSleepTime(date);
+        }
+        if (warningStored) {
+          const date = new Date(warningStored);
+          setWarningTime(date);
+          setTempWarningTime(date);
+        }
       } catch (e) {
         console.error('Failed to load times:', e);
       }
@@ -67,44 +77,36 @@ const SetSleepTime: React.FC = () => {
     );
   };
 
-  const handleSleepChange = async (event: any, selectedDate?: Date) => {
-    if (event.type === 'set' && selectedDate) {
-      setSleepTime(selectedDate);
-      try {
-        await AsyncStorage.setItem(SLEEP_TIME_KEY, selectedDate.toISOString());
-
-        await scheduleNotification(
-          selectedDate,
-          'sleep-time',
-          '😴 Time to Sleep',
-          'Your scheduled sleep time has arrived.'
-        );
-
-        Alert.alert('Success', 'Sleep time has been updated.');
-      } catch (e) {
-        console.error('Failed to save sleep time:', e);
-      }
+  const saveSleepTime = async () => {
+    try {
+      setSleepTime(tempSleepTime);
+      await AsyncStorage.setItem(SLEEP_TIME_KEY, tempSleepTime.toISOString());
+      await scheduleNotification(
+        tempSleepTime,
+        'sleep-time',
+        '😴 Time to Sleep',
+        'Your scheduled sleep time has arrived.'
+      );
+      Alert.alert('Success', 'Sleep time has been updated.');
+    } catch (e) {
+      console.error('Failed to save sleep time:', e);
     }
     setShowSleepPicker(false);
   };
 
-  const handleWarningChange = async (event: any, selectedDate?: Date) => {
-    if (event.type === 'set' && selectedDate) {
-      setWarningTime(selectedDate);
-      try {
-        await AsyncStorage.setItem(WARNING_TIME_KEY, selectedDate.toISOString());
-
-        await scheduleNotification(
-          selectedDate,
-          'warning-time',
-          '⏰ Bedtime Reminder',
-          'Your warning time before sleep is here.'
-        );
-
-        Alert.alert('Success', 'Warning time has been updated.');
-      } catch (e) {
-        console.error('Failed to save warning time:', e);
-      }
+  const saveWarningTime = async () => {
+    try {
+      setWarningTime(tempWarningTime);
+      await AsyncStorage.setItem(WARNING_TIME_KEY, tempWarningTime.toISOString());
+      await scheduleNotification(
+        tempWarningTime,
+        'warning-time',
+        '⏰ Bedtime Reminder',
+        'Your warning time before sleep is here.'
+      );
+      Alert.alert('Success', 'Warning time has been updated.');
+    } catch (e) {
+      console.error('Failed to save warning time:', e);
     }
     setShowWarningPicker(false);
   };
@@ -143,12 +145,15 @@ const SetSleepTime: React.FC = () => {
           {showSleepPicker && (
             <View style={styles.pickerContainer}>
               <DateTimePicker
-                value={sleepTime || new Date()}
+                value={tempSleepTime}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleSleepChange}
+                onChange={(e, d) => d && setTempSleepTime(d)}
                 themeVariant="light"
               />
+              <TouchableOpacity style={styles.saveButton} onPress={saveSleepTime}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -169,12 +174,15 @@ const SetSleepTime: React.FC = () => {
           {showWarningPicker && (
             <View style={styles.pickerContainer}>
               <DateTimePicker
-                value={warningTime || new Date()}
+                value={tempWarningTime}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleWarningChange}
+                onChange={(e, d) => d && setTempWarningTime(d)}
                 themeVariant="light"
               />
+              <TouchableOpacity style={styles.saveButton} onPress={saveWarningTime}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -245,7 +253,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#fff',
     borderRadius: 8,
-    overflow: 'hidden',
+    padding: 10,
+    alignItems: 'center',
+  },
+  saveButton: {
+    marginTop: 10,
+    backgroundColor: '#38A169',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 15,
   },
 });
 
