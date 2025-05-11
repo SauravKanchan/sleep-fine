@@ -14,4 +14,3 @@ Here is the list:
 {json.dumps(validators, indent=2)}
 """
 
-print(prompt)
