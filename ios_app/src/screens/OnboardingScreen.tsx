@@ -69,7 +69,10 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
         onPress={() => navigation.replace('SelectChallengeScreen')}
       />
       <Button title="3. Past Sleep" onPress={() => navigation.replace('Home')} />
-      {/* )} */}
+      <Button
+        title="4. Sleep Time Reminder"
+        onPress={() => navigation.replace('SleepTimeReminder')}
+      />
       {/* <Button title="Get Started" onPress={() => navigation.replace('Home')} /> */}
       {/* <AppKitButton />
       <Button title="Display Notification" onPress={() => onDisplayNotification()} /> */}

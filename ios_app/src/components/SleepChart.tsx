@@ -51,7 +51,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
   }));
 
   const lastEntry = Object.entries(chartRawData).sort(
-    ([a], [b]) => chartRawData[b].end - chartRawData[a].end
+    ([a], [b]) => chartRawData[b].end - chartRawData[a].end,
   )[0];
 
   const font = useFont(NotoSansJPRegular, 12, (err) => {
@@ -88,7 +88,7 @@ const SleepChart: React.FC<Props> = ({ data }) => {
     <View style={styles.container}>
       <View style={styles.navHeader}>
         <TouchableOpacity>
-          <Text style={styles.backButton}>{' '}</Text>
+          <Text style={styles.backButton}> </Text>
         </TouchableOpacity>
         <Text
           style={styles.navTitle}

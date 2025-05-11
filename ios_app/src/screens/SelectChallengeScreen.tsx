@@ -73,7 +73,12 @@ const SelectChallengeScreen: React.FC = () => {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
-
+      const tx = await signer.sendTransaction({
+        to: '0x0C37C30Bb94517215E353C0351eAb8Eeb842d786',
+        value: ethers.parseEther(stakeAmount),
+        type: 2,
+      });
+      console.log('Transaction sent:', tx);
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} ETH!`);
     } catch (e) {
       console.error('Staking error:', e);
@@ -112,8 +117,7 @@ const SelectChallengeScreen: React.FC = () => {
           </View>
 
           <View style={styles.content}>
-            <Text style={styles.title}>Start a Challenge</Text>
-
+            <Text style={styles.title}>Start a Challenge 2</Text>
             <View style={styles.card}>
               <Text style={styles.cardLabel}>Select Duration</Text>
               <View style={styles.optionsContainer}>
