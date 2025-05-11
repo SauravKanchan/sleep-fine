@@ -15,25 +15,25 @@ const provider = new ethers.JsonRpcProvider(RPC_URL);
 
 const wallet = new ethers.Wallet(PK, provider);
 
-// (async () => {
-//   const contractAddress = "0x0308D149EA4cBa0Bede727e01411879a88267432";
+(async () => {
+  const contractAddress = "0x0308D149EA4cBa0Bede727e01411879a88267432";
 
-//   const abi_a = [
-//     "function getCurrentDate() public view returns (uint64)",
-//     "function startChallenge(uint64 numDays, address app) external payable returns (uint256)",
-//   ];
+  const abi_a = [
+    "function getCurrentDate() public view returns (uint64)",
+    "function startChallenge(uint64 numDays, address app) external payable returns (uint256)",
+  ];
 
-//   const contract = new ethers.Contract(contractAddress, abi_a, wallet);
+  const contract = new ethers.Contract(contractAddress, abi_a, wallet);
 
-//   const tx = await contract.startChallenge(0, contractAddress, {
-//     value: ethers.parseEther("0.01"),
-//   });
-//   console.log("tx:", tx);
-//   const rc = await tx.wait();
-//   console.log("rc:", rc);
-// })()
-//   .then(console.log)
-//   .catch(console.error);
+  const tx = await contract.startChallenge(0, contractAddress, {
+    value: ethers.parseEther("0.01"),
+  });
+  console.log("tx:", tx);
+  const rc = await tx.wait();
+  console.log("rc:", rc);
+})()
+  .then(console.log)
+  .catch(console.error);
 
 (async () => {
   const contractAddress = "0xeCdda85AC4E1FC39e5344F4A322f43e3d661e287";
