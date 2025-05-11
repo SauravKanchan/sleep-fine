@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { Contract, BrowserProvider } from 'ethers';
 import {
@@ -47,9 +48,7 @@ const SelectChallengeScreen: React.FC = () => {
     try {
       if (isConnected && walletProvider) {
         const ethersProvider = new BrowserProvider(walletProvider);
-        // const ethersProvider = new ethers.JsonRpcProvider("https://westend-asset-hub-eth-rpc.polkadot.io");
         const signer = await ethersProvider.getSigner();
-        console.log('Signer address:', await signer.getAddress());
         const rawBalance = await ethersProvider.getBalance(await signer.getAddress());
         setBalance(ethers.formatEther(rawBalance));
       }
@@ -76,15 +75,13 @@ const SelectChallengeScreen: React.FC = () => {
       const ethersProvider = new BrowserProvider(walletProvider);
       const signer = await ethersProvider.getSigner();
       const contract = new Contract(contractData.address, contractData.abi, signer);
-      console.log('value', ethers.parseEther(stakeAmount));
+
       const id = await contract.startChallenge.staticCall(days, ethers.ZeroAddress, {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
-      // fetch private key from AsyncStorage
-      console.log('Challenge ID:', id);
+
       const privateKey = await AsyncStorage.getItem('privateKey');
-      console.log({ privateKey });
       let appSigner;
       if (!privateKey) {
         appSigner = await ethers.Wallet.createRandom();
@@ -92,13 +89,12 @@ const SelectChallengeScreen: React.FC = () => {
       } else {
         appSigner = new ethers.Wallet(privateKey);
       }
-      console.log('App signer:', appSigner.address);
 
       const tx = await contract.startChallenge(days, await appSigner.getAddress(), {
         value: ethers.parseEther(stakeAmount),
         type: 0,
       });
-      console.log('Transaction sent:', tx);
+
       Alert.alert('Challenge Started', `You committed to ${days} days with ${stakeAmount} WND!`);
     } catch (e) {
       console.error('Staking error:', e);
@@ -116,7 +112,11 @@ const SelectChallengeScreen: React.FC = () => {
           <AppKitButton />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.walletHeader}>
             <TouchableOpacity
               style={styles.navTitleContainer}
@@ -135,7 +135,9 @@ const SelectChallengeScreen: React.FC = () => {
               <AppKitButton />
             </View>
           </View>
+
           <SetSleepTime />
+
           <View style={styles.content}>
             <Text style={styles.title}>Start a Challenge</Text>
             <View style={styles.card}>
@@ -193,7 +195,7 @@ const SelectChallengeScreen: React.FC = () => {
               <Text style={styles.stakeButtonText}>Stake</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       )}
     </KeyboardAvoidingView>
   );
@@ -238,7 +240,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginTop: -80,
+    marginTop: -30,
   },
   title: {
     fontSize: 24,
