@@ -74,7 +74,18 @@ const SelectChallengeScreen: React.FC = () => {
         value: ethers.parseEther(stakeAmount),
       });
       await AsyncStorage.setItem('challengeId', id.toString());
-      const tx = await contract.startChallenge(days, ethers.ZeroAddress, {
+      // fetch private key from AsyncStorage
+      const privateKey = await AsyncStorage.getItem('privateKey');
+      let appSigner;
+      if (!privateKey) {
+        appSigner = await ethers.Wallet.createRandom();
+        await AsyncStorage.setItem('privateKey', appSigner.privateKey);
+      } else {
+        appSigner = new ethers.Wallet(privateKey);
+      }
+      console.log('App signer:', appSigner.address);
+
+      const tx = await contract.startChallenge(days, await appSigner.getAddress(), {
         value: ethers.parseEther(stakeAmount),
         type: 0,
       });
