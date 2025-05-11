@@ -5,7 +5,8 @@ with open("contractData.json", "r") as f:
 with open("ethereum_private_key.txt", "r") as f:
     private_key = f.read().strip()
 
-def set_validators(validators):
+def set_validators(validators_raw):
+    validators = [validators_raw["address"] for validator in validators_raw["validators"]]
     rpc_url = "https://westend-asset-hub-eth-rpc.polkadot.io"
     w3 = Web3(Web3.HTTPProvider(rpc_url))
 
