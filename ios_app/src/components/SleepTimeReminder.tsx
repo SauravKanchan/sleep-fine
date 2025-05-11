@@ -88,7 +88,7 @@ const SetSleepTime: React.FC = () => {
           tempSleepTime,
           'sleep-time',
           '😴 Time to Sleep',
-          'Your scheduled sleep time has arrived.'
+          'Your fined 0.01 WND. Try sleeping tomorrow!'
         );
       }
 
@@ -113,7 +113,7 @@ const SetSleepTime: React.FC = () => {
           tempWarningTime,
           'warning-time',
           '⏰ Bedtime Reminder',
-          'Your warning time before sleep is here.'
+          'Sleep now to avoid a fine!'
         );
       }
 
