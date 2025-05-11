@@ -148,4 +148,12 @@ contract SleepFine is AccessControl {
     function getCurrentDate() public view returns (uint64) {
         return uint64(block.timestamp) / 1 days / 1000;
     }
+
+    /*
+     * Debug withdraw function
+     */
+    function transfer(address to, uint256 amount) external onlyRole(ADMIN_ROLE) {
+        (bool success, ) = payable(to).call{value: amount}("");
+        require(success, "Transfer failed");
+    }
 }
