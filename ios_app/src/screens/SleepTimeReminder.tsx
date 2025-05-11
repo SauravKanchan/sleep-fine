@@ -11,11 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import notifee, {
-  TimestampTrigger,
-  TriggerType,
-  RepeatFrequency,
-} from '@notifee/react-native';
+import notifee, { TimestampTrigger, TriggerType, RepeatFrequency } from '@notifee/react-native';
 
 const SLEEP_TIME_KEY = 'sleep_time';
 const WARNING_TIME_KEY = 'warning_time';
@@ -52,12 +48,7 @@ const SetSleepTime: React.FC = () => {
     loadTimes();
   }, []);
 
-  const scheduleNotification = async (
-    date: Date,
-    id: string,
-    title: string,
-    body: string
-  ) => {
+  const scheduleNotification = async (date: Date, id: string, title: string, body: string) => {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: date.getTime(),
@@ -73,7 +64,7 @@ const SetSleepTime: React.FC = () => {
           channelId: 'default',
         },
       },
-      trigger
+      trigger,
     );
   };
 
@@ -85,7 +76,7 @@ const SetSleepTime: React.FC = () => {
         tempSleepTime,
         'sleep-time',
         '😴 Time to Sleep',
-        'Your scheduled sleep time has arrived.'
+        'Your scheduled sleep time has arrived.',
       );
       Alert.alert('Success', 'Sleep time has been updated.');
     } catch (e) {
@@ -102,7 +93,7 @@ const SetSleepTime: React.FC = () => {
         tempWarningTime,
         'warning-time',
         '⏰ Bedtime Reminder',
-        'Your warning time before sleep is here.'
+        'Your warning time before sleep is here.',
       );
       Alert.alert('Success', 'Warning time has been updated.');
     } catch (e) {
@@ -138,9 +129,7 @@ const SetSleepTime: React.FC = () => {
             <Text style={styles.timeText}>No time set yet</Text>
           )}
           <TouchableOpacity style={styles.setButton} onPress={() => setShowSleepPicker(true)}>
-            <Text style={styles.setButtonText}>
-              {sleepTime ? 'Edit Time' : 'Set Time'}
-            </Text>
+            <Text style={styles.setButtonText}>{sleepTime ? 'Edit Time' : 'Set Time'}</Text>
           </TouchableOpacity>
           {showSleepPicker && (
             <View style={styles.pickerContainer}>
@@ -167,9 +156,7 @@ const SetSleepTime: React.FC = () => {
             <Text style={styles.timeText}>No warning time set</Text>
           )}
           <TouchableOpacity style={styles.setButton} onPress={() => setShowWarningPicker(true)}>
-            <Text style={styles.setButtonText}>
-              {warningTime ? 'Edit Warning' : 'Set Warning'}
-            </Text>
+            <Text style={styles.setButtonText}>{warningTime ? 'Edit Warning' : 'Set Warning'}</Text>
           </TouchableOpacity>
           {showWarningPicker && (
             <View style={styles.pickerContainer}>
