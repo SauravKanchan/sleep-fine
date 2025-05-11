@@ -9,12 +9,13 @@ TOOL_NAME = "openai-gpt-3.5-turbo"
 CHAIN_CONFIG = "gnosis"
 USE_OFFCHAIN = False
 
-result = marketplace_interact(
+response = marketplace_interact(
     prompt=PROMPT_TEXT,
     priority_mech=PRIORITY_MECH_ADDRESS,
     use_offchain=USE_OFFCHAIN,
     tool=TOOL_NAME,
     chain_config=CHAIN_CONFIG
 )
-print(result)
-set_validators(result)
+if  "result" in response:
+    result = response["result"]
+    set_validators(result)
