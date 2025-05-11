@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator';
-import { AppKitButton } from '@reown/appkit-ethers-react-native';
 import { initHealthKit } from '../services/healthkit';
 import notifee from '@notifee/react-native';
 import { AuthorizationStatus } from '@notifee/react-native';

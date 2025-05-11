@@ -6,10 +6,16 @@ import {
   TouchableOpacity,
   Platform,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
+import notifee, {
+  TimestampTrigger,
+  TriggerType,
+  RepeatFrequency,
+} from '@notifee/react-native';
 
 const SLEEP_TIME_KEY = 'sleep_time';
 const WARNING_TIME_KEY = 'warning_time';
@@ -36,11 +42,45 @@ const SetSleepTime: React.FC = () => {
     loadTimes();
   }, []);
 
+  const scheduleNotification = async (
+    date: Date,
+    id: string,
+    title: string,
+    body: string
+  ) => {
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: date.getTime(),
+      repeatFrequency: RepeatFrequency.DAILY,
+    };
+
+    await notifee.createTriggerNotification(
+      {
+        id,
+        title,
+        body,
+        android: {
+          channelId: 'default',
+        },
+      },
+      trigger
+    );
+  };
+
   const handleSleepChange = async (event: any, selectedDate?: Date) => {
     if (event.type === 'set' && selectedDate) {
       setSleepTime(selectedDate);
       try {
         await AsyncStorage.setItem(SLEEP_TIME_KEY, selectedDate.toISOString());
+
+        await scheduleNotification(
+          selectedDate,
+          'sleep-time',
+          '😴 Time to Sleep',
+          'Your scheduled sleep time has arrived.'
+        );
+
+        Alert.alert('Success', 'Sleep time has been updated.');
       } catch (e) {
         console.error('Failed to save sleep time:', e);
       }
@@ -53,6 +93,15 @@ const SetSleepTime: React.FC = () => {
       setWarningTime(selectedDate);
       try {
         await AsyncStorage.setItem(WARNING_TIME_KEY, selectedDate.toISOString());
+
+        await scheduleNotification(
+          selectedDate,
+          'warning-time',
+          '⏰ Bedtime Reminder',
+          'Your warning time before sleep is here.'
+        );
+
+        Alert.alert('Success', 'Warning time has been updated.');
       } catch (e) {
         console.error('Failed to save warning time:', e);
       }
